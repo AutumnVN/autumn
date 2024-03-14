@@ -6,6 +6,7 @@
         "BackgroundRendererMixin",
         "CameraMixin",
         "ChatHudMixin",
+        "ClientPlayerInteractionManagerMixin",
         "LightmapTextureManagerMixin",
         "OptionsScreenMixin",
         "ToastManagerMixin"

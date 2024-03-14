@@ -26,6 +26,7 @@ public class Options {
     public SimpleOption<Boolean> fullBright;
     public SimpleOption<Boolean> instantSneak;
     public SimpleOption<Boolean> noFog;
+    public SimpleOption<Boolean> noMineDelay;
     public SimpleOption<Boolean> noToast;
     public SimpleOption<Boolean> rightClickHarvest;
     public SimpleOption<Boolean> thirdPersonNoClip;
@@ -42,6 +43,8 @@ public class Options {
         options.put("instantSneak", instantSneak);
         noFog = SimpleOption.ofBoolean("No Fog", value -> Tooltip.of(Text.of("Remove fog, including submersions & potion effects")), true);
         options.put("noFog", noFog);
+        noMineDelay = SimpleOption.ofBoolean("No Mine Delay", value -> Tooltip.of(Text.of("Remove 6-tick delay when mining blocks")), true);
+        options.put("noMineDelay", noMineDelay);
         noToast = SimpleOption.ofBoolean("No Toast", value -> Tooltip.of(Text.of("Remove all in-game toast")), true);
         options.put("noToast", noToast);
         rightClickHarvest = SimpleOption.ofBoolean("Right Click Harvest", value -> Tooltip.of(Text.of("Right click to harvest fully-grown crop & netherwart")), true);
