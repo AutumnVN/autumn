@@ -27,6 +27,7 @@ public class Options {
     public SimpleOption<Boolean> noFog;
     public SimpleOption<Boolean> noToast;
     public SimpleOption<Boolean> rightClickHarvest;
+    public SimpleOption<Boolean> thirdPersonNoClip;
 
     public Options() {
         this.file = new File(AutumnClient.client.runDirectory, "config/autumn.properties");
@@ -42,6 +43,8 @@ public class Options {
         options.put("noToast", noToast);
         rightClickHarvest = SimpleOption.ofBoolean("Right Click Harvest", value -> Tooltip.of(Text.of("Right click to harvest fully-grown crop & netherwart")), true);
         options.put("rightClickHarvest", rightClickHarvest);
+        thirdPersonNoClip = SimpleOption.ofBoolean("Third Person No Clip", value -> Tooltip.of(Text.of("Let third-person camera clip through blocks")), true);
+        options.put("thirdPersonNoClip", thirdPersonNoClip);
 
         if (file.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {

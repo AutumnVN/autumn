@@ -15,7 +15,8 @@ public class SettingsScreen extends Screen {
             AutumnClient.options.fullBright,
             AutumnClient.options.noFog,
             AutumnClient.options.noToast,
-            AutumnClient.options.rightClickHarvest
+            AutumnClient.options.rightClickHarvest,
+            AutumnClient.options.thirdPersonNoClip
     };
 
     public SettingsScreen(Screen parent) {
