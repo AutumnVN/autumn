@@ -22,6 +22,7 @@ public class Options {
     File file;
     Map<String, SimpleOption<?>> options;
 
+    public SimpleOption<Boolean> betterChat;
     public SimpleOption<Boolean> fullBright;
     public SimpleOption<Boolean> noToast;
     public SimpleOption<Boolean> rightClickHarvest;
@@ -30,6 +31,8 @@ public class Options {
         this.file = new File(AutumnClient.client.runDirectory, "config/autumn.properties");
         this.options = new HashMap<String, SimpleOption<?>>();
 
+        betterChat = SimpleOption.ofBoolean("Better Chat", value -> Tooltip.of(Text.of("Lengthen chat history to 65535 lines, keep chat/command history on switching world/server & remove chat indicator")), true);
+        options.put("betterChat", betterChat);
         fullBright = SimpleOption.ofBoolean("Full Bright", value -> Tooltip.of(Text.of("No more darkness")), true);
         options.put("fullBright", fullBright);
         noToast = SimpleOption.ofBoolean("No Toast", value -> Tooltip.of(Text.of("Remove all in-game toast")), true);
