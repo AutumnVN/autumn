@@ -12,6 +12,7 @@ public class SettingsScreen extends Screen {
     ButtonListWidget list;
     SimpleOption<?>[] options = new SimpleOption<?>[] {
             AutumnClient.options.fullBright,
+            AutumnClient.options.noToast,
             AutumnClient.options.rightClickHarvest
     };
 

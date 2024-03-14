@@ -23,6 +23,7 @@ public class Options {
     Map<String, SimpleOption<?>> options;
 
     public SimpleOption<Boolean> fullBright;
+    public SimpleOption<Boolean> noToast;
     public SimpleOption<Boolean> rightClickHarvest;
 
     public Options() {
@@ -31,6 +32,8 @@ public class Options {
 
         fullBright = SimpleOption.ofBoolean("Full Bright", value -> Tooltip.of(Text.of("No more darkness")), true);
         options.put("fullBright", fullBright);
+        noToast = SimpleOption.ofBoolean("No Toast", value -> Tooltip.of(Text.of("Remove all in-game toast")), true);
+        options.put("noToast", noToast);
         rightClickHarvest = SimpleOption.ofBoolean("Right Click Harvest", value -> Tooltip.of(Text.of("Right click to harvest fully-grown crop & netherwart")), true);
         options.put("rightClickHarvest", rightClickHarvest);
 
