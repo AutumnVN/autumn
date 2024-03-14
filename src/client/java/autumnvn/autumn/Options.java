@@ -22,12 +22,15 @@ public class Options {
     File file;
     Map<String, SimpleOption<?>> options;
 
-    SimpleOption<Boolean> rightClickHarvest;
+    public SimpleOption<Boolean> fullBright;
+    public SimpleOption<Boolean> rightClickHarvest;
 
     public Options() {
         this.file = new File(AutumnClient.client.runDirectory, "config/autumn.properties");
         this.options = new HashMap<String, SimpleOption<?>>();
 
+        fullBright = SimpleOption.ofBoolean("Full Bright", value -> Tooltip.of(Text.of("No more darkness")), true);
+        options.put("fullBright", fullBright);
         rightClickHarvest = SimpleOption.ofBoolean("Right Click Harvest", value -> Tooltip.of(Text.of("Right click to harvest fully-grown crop & netherwart")), true);
         options.put("rightClickHarvest", rightClickHarvest);
 
