@@ -14,15 +14,22 @@ import java.util.Map.Entry;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.option.SimpleOption;
+import net.minecraft.text.Text;
 
 public class Options {
     File file;
     Map<String, SimpleOption<?>> options;
 
+    SimpleOption<Boolean> rightClickHarvest;
+
     public Options() {
         this.file = new File(AutumnClient.client.runDirectory, "config/autumn.properties");
         this.options = new HashMap<String, SimpleOption<?>>();
+
+        rightClickHarvest = SimpleOption.ofBoolean("Right Click Harvest", value -> Tooltip.of(Text.of("Right click to harvest fully-grown crop & netherwart")), true);
+        options.put("rightClickHarvest", rightClickHarvest);
 
         if (file.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {

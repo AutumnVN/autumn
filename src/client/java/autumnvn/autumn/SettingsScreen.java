@@ -10,7 +10,9 @@ import net.minecraft.text.Text;
 public class SettingsScreen extends Screen {
     Screen parent;
     ButtonListWidget list;
-    SimpleOption<?>[] options = new SimpleOption<?>[] {};
+    SimpleOption<?>[] options = new SimpleOption<?>[] {
+            AutumnClient.options.rightClickHarvest
+    };
 
     public SettingsScreen(Screen parent) {
         super(Text.of("Autumn Settings"));
