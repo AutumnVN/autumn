@@ -24,6 +24,7 @@ public class Options {
 
     public SimpleOption<Boolean> betterChat;
     public SimpleOption<Boolean> fullBright;
+    public SimpleOption<Boolean> instantSneak;
     public SimpleOption<Boolean> noFog;
     public SimpleOption<Boolean> noToast;
     public SimpleOption<Boolean> rightClickHarvest;
@@ -37,6 +38,8 @@ public class Options {
         options.put("betterChat", betterChat);
         fullBright = SimpleOption.ofBoolean("Full Bright", value -> Tooltip.of(Text.of("No more darkness")), true);
         options.put("fullBright", fullBright);
+        instantSneak = SimpleOption.ofBoolean("Instant Sneak", value -> Tooltip.of(Text.of("Instantly sneak when holding shift, no animation")), true);
+        options.put("instantSneak", instantSneak);
         noFog = SimpleOption.ofBoolean("No Fog", value -> Tooltip.of(Text.of("Remove fog, including submersions & potion effects")), true);
         options.put("noFog", noFog);
         noToast = SimpleOption.ofBoolean("No Toast", value -> Tooltip.of(Text.of("Remove all in-game toast")), true);
