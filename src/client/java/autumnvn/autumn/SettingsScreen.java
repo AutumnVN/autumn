@@ -13,6 +13,7 @@ public class SettingsScreen extends Screen {
     SimpleOption<?>[] options = new SimpleOption<?>[] {
             AutumnClient.options.betterChat,
             AutumnClient.options.fullBright,
+            AutumnClient.options.horseSwim,
             AutumnClient.options.instantSneak,
             AutumnClient.options.noFishingBobber,
             AutumnClient.options.noFog,

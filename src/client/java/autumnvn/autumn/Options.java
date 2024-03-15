@@ -24,6 +24,7 @@ public class Options {
 
     public SimpleOption<Boolean> betterChat;
     public SimpleOption<Boolean> fullBright;
+    public SimpleOption<Boolean> horseSwim;
     public SimpleOption<Boolean> instantSneak;
     public SimpleOption<Boolean> noFishingBobber;
     public SimpleOption<Boolean> noFog;
@@ -42,6 +43,8 @@ public class Options {
         options.put("betterChat", betterChat);
         fullBright = SimpleOption.ofBoolean("Full Bright", value -> Tooltip.of(Text.of("No more darkness")), true);
         options.put("fullBright", fullBright);
+        horseSwim = SimpleOption.ofBoolean("Horse Swim", value -> Tooltip.of(Text.of("Make riding horse swim in water")), true);
+        options.put("horseSwim", horseSwim);
         instantSneak = SimpleOption.ofBoolean("Instant Sneak", value -> Tooltip.of(Text.of("Instantly sneak when holding shift, no animation")), true);
         options.put("instantSneak", instantSneak);
         noFishingBobber = SimpleOption.ofBoolean("No Fishing Bobber", value -> Tooltip.of(Text.of("Remove fishing bobber when it hooked on your face")), true);
