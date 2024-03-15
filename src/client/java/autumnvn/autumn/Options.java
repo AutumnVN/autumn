@@ -26,6 +26,7 @@ public class Options {
     public SimpleOption<Boolean> fullBright;
     public SimpleOption<Boolean> horseSwim;
     public SimpleOption<Boolean> instantSneak;
+    public SimpleOption<Boolean> noFade;
     public SimpleOption<Boolean> noFishingBobber;
     public SimpleOption<Boolean> noFog;
     public SimpleOption<Boolean> noInvisible;
@@ -47,6 +48,8 @@ public class Options {
         options.put("horseSwim", horseSwim);
         instantSneak = SimpleOption.ofBoolean("Instant Sneak", value -> Tooltip.of(Text.of("Instantly sneak when holding shift, no animation")), true);
         options.put("instantSneak", instantSneak);
+        noFade = SimpleOption.ofBoolean("No Fade", value -> Tooltip.of(Text.of("Remove fade animation on splash & title screen")), true);
+        options.put("noFade", noFade);
         noFishingBobber = SimpleOption.ofBoolean("No Fishing Bobber", value -> Tooltip.of(Text.of("Remove fishing bobber when it hooked on your face")), true);
         options.put("noFishingBobber", noFishingBobber);
         noFog = SimpleOption.ofBoolean("No Fog", value -> Tooltip.of(Text.of("Remove fog, including submersions & potion effects")), true);

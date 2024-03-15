@@ -13,6 +13,8 @@
         "LivingEntityMixin",
         "MinecraftClientMixin",
         "OptionsScreenMixin",
+        "SplashOverlayMixin",
+        "TitleScreenMixin",
         "ToastManagerMixin"
     ],
     "injectors": {
