@@ -14,6 +14,7 @@ public class SettingsScreen extends Screen {
             AutumnClient.options.betterChat,
             AutumnClient.options.fullBright,
             AutumnClient.options.instantSneak,
+            AutumnClient.options.noFishingBobber,
             AutumnClient.options.noFog,
             AutumnClient.options.noInvisible,
             AutumnClient.options.noMineDelay,

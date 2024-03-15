@@ -8,6 +8,7 @@
         "ChatHudMixin",
         "ClientPlayerInteractionManagerMixin",
         "EntityMixin",
+        "FishingBobberEntityRendererMixin",
         "LightmapTextureManagerMixin",
         "MinecraftClientMixin",
         "OptionsScreenMixin",

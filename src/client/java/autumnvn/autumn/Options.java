@@ -25,6 +25,7 @@ public class Options {
     public SimpleOption<Boolean> betterChat;
     public SimpleOption<Boolean> fullBright;
     public SimpleOption<Boolean> instantSneak;
+    public SimpleOption<Boolean> noFishingBobber;
     public SimpleOption<Boolean> noFog;
     public SimpleOption<Boolean> noInvisible;
     public SimpleOption<Boolean> noMineDelay;
@@ -43,6 +44,8 @@ public class Options {
         options.put("fullBright", fullBright);
         instantSneak = SimpleOption.ofBoolean("Instant Sneak", value -> Tooltip.of(Text.of("Instantly sneak when holding shift, no animation")), true);
         options.put("instantSneak", instantSneak);
+        noFishingBobber = SimpleOption.ofBoolean("No Fishing Bobber", value -> Tooltip.of(Text.of("Remove fishing bobber when it hooked on your face")), true);
+        options.put("noFishingBobber", noFishingBobber);
         noFog = SimpleOption.ofBoolean("No Fog", value -> Tooltip.of(Text.of("Remove fog, including submersions & potion effects")), true);
         options.put("noFog", noFog);
         noInvisible = SimpleOption.ofBoolean("No Invisible", value -> Tooltip.of(Text.of("Force render invisible entities")), true);
