@@ -22,6 +22,8 @@ public class Options {
     File file;
     Map<String, SimpleOption<?>> options;
 
+    public SimpleOption<Boolean> autoAttack;
+    public SimpleOption<Boolean> ignorePlayer;
     public SimpleOption<Boolean> betterChat;
     public SimpleOption<Boolean> fullBright;
     public SimpleOption<Boolean> horseSwim;
@@ -40,6 +42,10 @@ public class Options {
         this.file = new File(AutumnClient.client.runDirectory, "config/autumn.properties");
         this.options = new HashMap<String, SimpleOption<?>>();
 
+        autoAttack = SimpleOption.ofBoolean("Auto Attack", value -> Tooltip.of(Text.of("Automatically attack living entity at crosshair within reach")), false);
+        options.put("autoAttack", autoAttack);
+        ignorePlayer = SimpleOption.ofBoolean("Ignore Player", value -> Tooltip.of(Text.of("Auto Attack will ignore player")), false);
+        options.put("ignorePlayer", ignorePlayer);
         betterChat = SimpleOption.ofBoolean("Better Chat", value -> Tooltip.of(Text.of("Lengthen chat history to 65535 lines, keep chat/command history on switching world/server & remove chat indicator")), true);
         options.put("betterChat", betterChat);
         fullBright = SimpleOption.ofBoolean("Full Bright", value -> Tooltip.of(Text.of("No more darkness")), true);

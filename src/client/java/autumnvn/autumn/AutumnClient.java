@@ -9,6 +9,10 @@ import net.minecraft.block.CropBlock;
 import net.minecraft.block.NetherWartBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.option.SimpleOption;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult.Type;
 import net.minecraft.util.math.BlockPos;
@@ -16,17 +20,30 @@ import net.minecraft.util.math.BlockPos;
 public class AutumnClient implements ClientModInitializer {
     public static MinecraftClient client;
     public static Options options;
+    public static KeyBinding autoAttackKey;
+    public static KeyBinding ignorePlayerKey;
     public static KeyBinding settingKey;
 
     @Override
     public void onInitializeClient() {
         client = MinecraftClient.getInstance();
         options = new Options();
+        options.autoAttack.setValue(false);
+        autoAttackKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Auto Attack", GLFW.GLFW_KEY_R, "Autumn"));
+        ignorePlayerKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Ignore Player", GLFW.GLFW_KEY_UNKNOWN, "Autumn"));
         settingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Open Autumn Settings", GLFW.GLFW_KEY_BACKSLASH, "Autumn"));
 
         ClientTickEvents.START_WORLD_TICK.register(world -> {
             while (settingKey.wasPressed()) {
                 client.setScreen(new SettingsScreen(client.currentScreen));
+            }
+            handleToggleKey(autoAttackKey, options.autoAttack, "Auto Attack");
+            handleToggleKey(ignorePlayerKey, options.ignorePlayer, "Ignore Player");
+
+            // AutoAttack
+            if (options.autoAttack.getValue() && client.player.getAttackCooldownProgress(0) >= 1 && client.targetedEntity instanceof LivingEntity livingEntity && livingEntity.isAttackable() && livingEntity.isAlive() && livingEntity.hurtTime == 0 && !(options.ignorePlayer.getValue() && livingEntity instanceof PlayerEntity)) {
+                client.interactionManager.attackEntity(client.player, livingEntity);
+                client.player.swingHand(client.player.getActiveHand());
             }
 
             // RightClickHarvest
@@ -40,5 +57,12 @@ public class AutumnClient implements ClientModInitializer {
                 }
             }
         });
+    }
+
+    private void handleToggleKey(KeyBinding key, SimpleOption<Boolean> option, String name) {
+        while (key.wasPressed()) {
+            option.setValue(!option.getValue());
+            client.player.sendMessage(Text.of(name + " is now " + (option.getValue() ? "§aON" : "§cOFF")), true);
+        }
     }
 }
