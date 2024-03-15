@@ -37,6 +37,7 @@ public class Options {
     public SimpleOption<Boolean> noUseDelay;
     public SimpleOption<Boolean> rightClickHarvest;
     public SimpleOption<Boolean> thirdPersonNoClip;
+    public SimpleOption<Boolean> visibleBarrier;
 
     public Options() {
         this.file = new File(AutumnClient.client.runDirectory, "config/autumn.properties");
@@ -72,6 +73,8 @@ public class Options {
         options.put("rightClickHarvest", rightClickHarvest);
         thirdPersonNoClip = SimpleOption.ofBoolean("Third Person No Clip", value -> Tooltip.of(Text.of("Let third-person camera clip through blocks")), true);
         options.put("thirdPersonNoClip", thirdPersonNoClip);
+        visibleBarrier = SimpleOption.ofBoolean("Visible Barrier", value -> Tooltip.of(Text.of("Force render barrier block")), true);
+        options.put("visibleBarrier", visibleBarrier);
 
         if (file.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {

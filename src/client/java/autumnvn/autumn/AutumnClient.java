@@ -4,6 +4,9 @@ import org.lwjgl.glfw.GLFW;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.CropBlock;
 import net.minecraft.block.NetherWartBlock;
@@ -13,6 +16,7 @@ import net.minecraft.client.option.SimpleOption;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult.Type;
 import net.minecraft.util.math.BlockPos;
@@ -34,6 +38,8 @@ public class AutumnClient implements ClientModInitializer {
         ignorePlayerKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Ignore Player", GLFW.GLFW_KEY_UNKNOWN, "Autumn"));
         settingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Open Autumn Settings", GLFW.GLFW_KEY_BACKSLASH, "Autumn"));
         zoomKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Zoom", GLFW.GLFW_KEY_LEFT_ALT, "Autumn"));
+
+        FabricLoader.getInstance().getModContainer("autumn").ifPresent(container -> ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("autumn", "autumn"), container, ResourcePackActivationType.DEFAULT_ENABLED));
 
         ClientTickEvents.START_WORLD_TICK.register(world -> {
             while (settingKey.wasPressed()) {
