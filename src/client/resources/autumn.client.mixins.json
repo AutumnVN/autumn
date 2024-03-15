@@ -9,6 +9,7 @@
         "ClientPlayerInteractionManagerMixin",
         "EntityMixin",
         "FishingBobberEntityRendererMixin",
+        "GameRendererMixin",
         "LightmapTextureManagerMixin",
         "LivingEntityMixin",
         "MinecraftClientMixin",

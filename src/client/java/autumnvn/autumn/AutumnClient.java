@@ -23,6 +23,7 @@ public class AutumnClient implements ClientModInitializer {
     public static KeyBinding autoAttackKey;
     public static KeyBinding ignorePlayerKey;
     public static KeyBinding settingKey;
+    public static KeyBinding zoomKey;
 
     @Override
     public void onInitializeClient() {
@@ -32,6 +33,7 @@ public class AutumnClient implements ClientModInitializer {
         autoAttackKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Auto Attack", GLFW.GLFW_KEY_R, "Autumn"));
         ignorePlayerKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Ignore Player", GLFW.GLFW_KEY_UNKNOWN, "Autumn"));
         settingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Open Autumn Settings", GLFW.GLFW_KEY_BACKSLASH, "Autumn"));
+        zoomKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Zoom", GLFW.GLFW_KEY_LEFT_ALT, "Autumn"));
 
         ClientTickEvents.START_WORLD_TICK.register(world -> {
             while (settingKey.wasPressed()) {
