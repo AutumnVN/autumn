@@ -26,6 +26,7 @@ public class SettingsScreen extends Screen {
             AutumnClient.options.noMineDelay,
             AutumnClient.options.noToast,
             AutumnClient.options.noUseDelay,
+            AutumnClient.options.pingNumber,
             AutumnClient.options.rightClickHarvest,
             AutumnClient.options.thirdPersonNoClip,
             AutumnClient.options.visibleBarrier

@@ -37,6 +37,7 @@ public class Options {
     public SimpleOption<Boolean> noMineDelay;
     public SimpleOption<Boolean> noToast;
     public SimpleOption<Boolean> noUseDelay;
+    public SimpleOption<Boolean> pingNumber;
     public SimpleOption<Boolean> rightClickHarvest;
     public SimpleOption<Boolean> thirdPersonNoClip;
     public SimpleOption<Boolean> visibleBarrier;
@@ -75,6 +76,8 @@ public class Options {
         options.put("noToast", noToast);
         noUseDelay = SimpleOption.ofBoolean("No Use Delay", value -> Tooltip.of(Text.of("Remove 4-tick delay when using items")), false);
         options.put("noUseDelay", noUseDelay);
+        pingNumber = SimpleOption.ofBoolean("Ping Number", value -> Tooltip.of(Text.of("Show ping number on tab list")), true);
+        options.put("pingNumber", pingNumber);
         rightClickHarvest = SimpleOption.ofBoolean("Right Click Harvest", value -> Tooltip.of(Text.of("Right click to harvest fully-grown crop & netherwart")), true);
         options.put("rightClickHarvest", rightClickHarvest);
         thirdPersonNoClip = SimpleOption.ofBoolean("Third Person No Clip", value -> Tooltip.of(Text.of("Let third-person camera clip through blocks")), true);
