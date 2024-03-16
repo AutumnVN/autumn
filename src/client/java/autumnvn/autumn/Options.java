@@ -27,6 +27,7 @@ public class Options {
     public SimpleOption<Boolean> betterChat;
     public SimpleOption<Boolean> fullBright;
     public SimpleOption<Boolean> horseSwim;
+    public SimpleOption<Boolean> infoHud;
     public SimpleOption<Boolean> instantSneak;
     public SimpleOption<Boolean> noFade;
     public SimpleOption<Boolean> noFishingBobber;
@@ -53,6 +54,8 @@ public class Options {
         options.put("fullBright", fullBright);
         horseSwim = SimpleOption.ofBoolean("Horse Swim", value -> Tooltip.of(Text.of("Make riding horse swim in water")), true);
         options.put("horseSwim", horseSwim);
+        infoHud = SimpleOption.ofBoolean("Info Hud", value -> Tooltip.of(Text.of("Show fps, coordinates, direction, tps, targeted entity health & horse stats on screen, show armor above hotbar, show hunger & xp bar when riding")), true);
+        options.put("infoHud", infoHud);
         instantSneak = SimpleOption.ofBoolean("Instant Sneak", value -> Tooltip.of(Text.of("Instantly sneak when holding shift, no animation")), true);
         options.put("instantSneak", instantSneak);
         noFade = SimpleOption.ofBoolean("No Fade", value -> Tooltip.of(Text.of("Remove fade animation on splash & title screen")), true);

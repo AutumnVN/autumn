@@ -28,6 +28,7 @@ public class AutumnClient implements ClientModInitializer {
     public static KeyBinding ignorePlayerKey;
     public static KeyBinding settingKey;
     public static KeyBinding zoomKey;
+    public static double tps;
 
     @Override
     public void onInitializeClient() {
