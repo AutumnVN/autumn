@@ -25,6 +25,7 @@ public class Options {
     public SimpleOption<Boolean> autoAttack;
     public SimpleOption<Boolean> ignorePlayer;
     public SimpleOption<Boolean> betterChat;
+    public SimpleOption<Boolean> betterNametag;
     public SimpleOption<Boolean> fullBright;
     public SimpleOption<Boolean> horseSwim;
     public SimpleOption<Boolean> infoHud;
@@ -50,6 +51,8 @@ public class Options {
         options.put("ignorePlayer", ignorePlayer);
         betterChat = SimpleOption.ofBoolean("Better Chat", value -> Tooltip.of(Text.of("Lengthen chat history to 65535 lines, keep chat/command history on switching world/server & remove chat indicator")), true);
         options.put("betterChat", betterChat);
+        betterNametag = SimpleOption.ofBoolean("Better Nametag", value -> Tooltip.of(Text.of("Add health & gamemode to nametag, make nametag always visible & show targeted entity nametag")), true);
+        options.put("betterNametag", betterNametag);
         fullBright = SimpleOption.ofBoolean("Full Bright", value -> Tooltip.of(Text.of("No more darkness")), true);
         options.put("fullBright", fullBright);
         horseSwim = SimpleOption.ofBoolean("Horse Swim", value -> Tooltip.of(Text.of("Make riding horse swim in water")), true);

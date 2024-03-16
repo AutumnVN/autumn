@@ -14,6 +14,7 @@ public class SettingsScreen extends Screen {
             AutumnClient.options.autoAttack,
             AutumnClient.options.ignorePlayer,
             AutumnClient.options.betterChat,
+            AutumnClient.options.betterNametag,
             AutumnClient.options.fullBright,
             AutumnClient.options.horseSwim,
             AutumnClient.options.infoHud,
