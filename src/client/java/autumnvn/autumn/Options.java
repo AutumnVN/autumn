@@ -26,6 +26,7 @@ public class Options {
     public SimpleOption<Boolean> ignorePlayer;
     public SimpleOption<Boolean> betterChat;
     public SimpleOption<Boolean> betterNametag;
+    public SimpleOption<Boolean> deathCoord;
     public SimpleOption<Boolean> fullBright;
     public SimpleOption<Boolean> horseSwim;
     public SimpleOption<Boolean> infoHud;
@@ -54,6 +55,8 @@ public class Options {
         options.put("betterChat", betterChat);
         betterNametag = SimpleOption.ofBoolean("Better Nametag", value -> Tooltip.of(Text.of("Add health & gamemode to nametag, make nametag always visible & show targeted entity nametag")), true);
         options.put("betterNametag", betterNametag);
+        deathCoord = SimpleOption.ofBoolean("Death Coord", value -> Tooltip.of(Text.of("Show death coordinates in chat")), true);
+        options.put("deathCoord", deathCoord);
         fullBright = SimpleOption.ofBoolean("Full Bright", value -> Tooltip.of(Text.of("No more darkness")), true);
         options.put("fullBright", fullBright);
         horseSwim = SimpleOption.ofBoolean("Horse Swim", value -> Tooltip.of(Text.of("Make riding horse swim in water")), true);

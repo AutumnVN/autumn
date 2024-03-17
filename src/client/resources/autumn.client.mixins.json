@@ -9,6 +9,7 @@
         "ChatHudMixin",
         "ClientPlayerInteractionManagerMixin",
         "ClientPlayNetworkHandlerMixin",
+        "DeathScreenMixin",
         "EntityMixin",
         "EntityRendererMixin",
         "FishingBobberEntityRendererMixin",
