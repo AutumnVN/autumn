@@ -20,6 +20,7 @@ public class SettingsScreen extends Screen {
             AutumnClient.options.horseSwim,
             AutumnClient.options.infoHud,
             AutumnClient.options.instantSneak,
+            AutumnClient.options.keepMiningWhenSwap,
             AutumnClient.options.noFade,
             AutumnClient.options.noFishingBobber,
             AutumnClient.options.noFog,

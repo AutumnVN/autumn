@@ -26,6 +26,7 @@ public class Options {
     public SimpleOption<Boolean> horseSwim;
     public SimpleOption<Boolean> infoHud;
     public SimpleOption<Boolean> instantSneak;
+    public SimpleOption<Boolean> keepMiningWhenSwap;
     public SimpleOption<Boolean> noFade;
     public SimpleOption<Boolean> noFishingBobber;
     public SimpleOption<Boolean> noFog;
@@ -60,6 +61,8 @@ public class Options {
         options.put("infoHud", infoHud);
         instantSneak = SimpleOption.ofBoolean("Instant Sneak", value -> Tooltip.of(Text.of("Instantly sneak when holding shift, no animation")), true);
         options.put("instantSneak", instantSneak);
+        keepMiningWhenSwap = SimpleOption.ofBoolean("Keep Mining When Swap", value -> Tooltip.of(Text.of("Keep mining block when swapping item")), true);
+        options.put("keepMiningWhenSwap", keepMiningWhenSwap);
         noFade = SimpleOption.ofBoolean("No Fade", value -> Tooltip.of(Text.of("Remove fade animation on splash & title screen")), true);
         options.put("noFade", noFade);
         noFishingBobber = SimpleOption.ofBoolean("No Fishing Bobber", value -> Tooltip.of(Text.of("Remove fishing bobber when it hooked on your face")), true);
