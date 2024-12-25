@@ -1,18 +1,20 @@
 package autumnvn.autumn;
 
-import org.lwjgl.glfw.GLFW;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.CropBlock;
 import net.minecraft.block.NetherWartBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.SimpleOption;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
@@ -20,6 +22,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult.Type;
 import net.minecraft.util.math.BlockPos;
+import org.lwjgl.glfw.GLFW;
 
 public class AutumnClient implements ClientModInitializer {
     public static MinecraftClient client;
@@ -40,9 +43,12 @@ public class AutumnClient implements ClientModInitializer {
         settingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Open Autumn Settings", GLFW.GLFW_KEY_BACKSLASH, "Autumn"));
         zoomKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Zoom", GLFW.GLFW_KEY_LEFT_ALT, "Autumn"));
 
-        FabricLoader.getInstance().getModContainer("autumn").ifPresent(container -> ResourceManagerHelper.registerBuiltinResourcePack(new Identifier("autumn", "autumn"), container, ResourcePackActivationType.DEFAULT_ENABLED));
+        FabricLoader.getInstance().getModContainer("autumn").ifPresent(container -> ResourceManagerHelper.registerBuiltinResourcePack(Identifier.of("autumn", "autumn"), container, ResourcePackActivationType.DEFAULT_ENABLED));
+        BlockRenderLayerMap.INSTANCE.putBlock(Blocks.BARRIER, RenderLayer.getTranslucent());
 
-        ClientTickEvents.START_WORLD_TICK.register(world -> {
+
+        ClientTickEvents.START_CLIENT_TICK.register(client -> {
+            if (client.player == null || client.interactionManager == null || client.world == null) return;
             while (settingKey.wasPressed()) {
                 client.setScreen(new SettingsScreen(client.currentScreen));
             }
@@ -59,8 +65,8 @@ public class AutumnClient implements ClientModInitializer {
             if (options.rightClickHarvest.getValue() && client.options.useKey.isPressed() && client.crosshairTarget != null && client.crosshairTarget.getType() == Type.BLOCK) {
                 BlockHitResult hitResult = (BlockHitResult) client.crosshairTarget;
                 BlockPos pos = hitResult.getBlockPos();
-                Block block = world.getBlockState(pos).getBlock();
-                if (block instanceof CropBlock cropBlock && cropBlock.isMature(world.getBlockState(pos)) || block instanceof NetherWartBlock && world.getBlockState(pos).get(NetherWartBlock.AGE) == 3) {
+                Block block = client.world.getBlockState(pos).getBlock();
+                if (block instanceof CropBlock cropBlock && cropBlock.isMature(client.world.getBlockState(pos)) || block instanceof NetherWartBlock && client.world.getBlockState(pos).get(NetherWartBlock.AGE) == 3) {
                     client.interactionManager.attackBlock(pos, hitResult.getSide());
                     client.player.swingHand(client.player.getActiveHand());
                 }
@@ -69,6 +75,7 @@ public class AutumnClient implements ClientModInitializer {
     }
 
     private void handleToggleKey(KeyBinding key, SimpleOption<Boolean> option, String name) {
+        if (client.player == null) return;
         while (key.wasPressed()) {
             option.setValue(!option.getValue());
             client.player.sendMessage(Text.of(name + " is now " + (option.getValue() ? "§aON" : "§cOFF")), true);

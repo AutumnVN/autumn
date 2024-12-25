@@ -1,7 +1,5 @@
 package autumnvn.autumn;
 
-import java.util.List;
-import java.util.Map;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.MinecraftClient;
@@ -11,6 +9,9 @@ import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.option.SimpleOption;
+
+import java.util.List;
+import java.util.Map;
 
 public class ButtonListWidget extends ElementListWidget<ButtonListWidget.ButtonEntry> {
     public ButtonListWidget(MinecraftClient client, int width, int height, int y, int itemHeight) {
@@ -28,11 +29,6 @@ public class ButtonListWidget extends ElementListWidget<ButtonListWidget.ButtonE
     @Override
     public int getRowWidth() {
         return 400;
-    }
-
-    @Override
-    protected int getScrollbarPositionX() {
-        return super.getScrollbarPositionX() + 32;
     }
 
     static class ButtonEntry extends ElementListWidget.Entry<ButtonEntry> {

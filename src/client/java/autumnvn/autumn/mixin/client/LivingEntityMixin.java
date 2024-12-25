@@ -1,24 +1,32 @@
 package autumnvn.autumn.mixin.client;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import autumnvn.autumn.AutumnClient;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.AbstractHorseEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.math.Vec3d;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin {
 
     // HorseSwim
-    @Inject(method = "travelControlled", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;travel(Lnet/minecraft/util/math/Vec3d;)V", shift = At.Shift.BEFORE))
+    @Inject(method = "travelControlled", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;travel(Lnet/minecraft/util/math/Vec3d;)V"))
     private void travelControlled(PlayerEntity controllingPlayer, Vec3d movementInput, CallbackInfo ci) {
-        if (AutumnClient.options.horseSwim.getValue() && (Object) this instanceof AbstractHorseEntity horse && horse.getFluidHeight(FluidTags.WATER) > horse.getSwimHeight()) {
-            horse.addVelocity(0, 0.1, 0);
+        if (AutumnClient.options.horseSwim.getValue()) {
+            if ((Object) this instanceof AbstractHorseEntity horse) {
+                if (horse.getFluidHeight(FluidTags.WATER) > 0.4 || horse.getFluidHeight(FluidTags.LAVA) > 0.4) {
+                    if (horse.isTouchingWater()) {
+                        horse.addVelocity(0, horse.getFluidHeight(FluidTags.WATER) > 0.8 ? 0.04 : 0.01, 0);
+                    } else if (horse.isInLava()) {
+                        horse.addVelocity(0, horse.getFluidHeight(FluidTags.LAVA) > 0.8 ? 0.11 : 0.0275, 0);
+                    }
+                }
+            }
         }
     }
 }

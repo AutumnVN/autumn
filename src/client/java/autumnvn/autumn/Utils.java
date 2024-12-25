@@ -1,12 +1,18 @@
 package autumnvn.autumn;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.passive.TameableEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
+import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
+import java.util.Objects;
+
 public class Utils {
+
     private static class TimedEntity {
         long time;
         Entity entity;
@@ -19,12 +25,16 @@ public class Utils {
 
     private static TimedEntity recentTargetedEntity;
 
-    public static Entity getTargetedEntity(float tickDelta) {
-        Entity entity2 = AutumnClient.client.getCameraEntity();
-        Vec3d vec3d = entity2.getCameraPosVec(tickDelta);
-        Vec3d vec3d2 = entity2.getRotationVec(1);
-        Box box = entity2.getBoundingBox().expand(32767, 32767, 32767);
-        EntityHitResult entityHitResult = ProjectileUtil.raycast(entity2, vec3d, vec3d.add(vec3d2.multiply(32767)), box, entity -> !entity.isSpectator() && entity.canHit(), 32767);
+    public static Entity getTargetedEntity() {
+        Entity cameraEntity = AutumnClient.client.getCameraEntity();
+        if (cameraEntity == null) return null;
+
+        double maxDistance = 128;
+        float tickDelta = AutumnClient.client.getRenderTickCounter().getTickDelta(true);
+        Vec3d vec3d = cameraEntity.getEyePos();
+        Vec3d vec3d2 = cameraEntity.getRotationVec(tickDelta).multiply(maxDistance);
+        Box box = cameraEntity.getBoundingBox().stretch(vec3d2).expand(1.0);
+        EntityHitResult entityHitResult = ProjectileUtil.raycast(cameraEntity, vec3d, vec3d.add(vec3d2), box, EntityPredicates.CAN_HIT, maxDistance * maxDistance);
 
         if (entityHitResult != null) {
             recentTargetedEntity = new TimedEntity(entityHitResult.getEntity());
@@ -41,5 +51,13 @@ public class Utils {
     public static String color(double value, double min, double max) {
         double third = (max - min) / 3;
         return value < min + third ? "§c" : value < min + third * 2 ? "§e" : "§a";
+    }
+
+    public static String getOwnerName(Entity entity) {
+        if (!(entity instanceof TameableEntity tameableEntity)) return null;
+        if (tameableEntity.getOwnerUuid() == null) return null;
+        PlayerEntity owner = entity.getWorld().getPlayerByUuid(tameableEntity.getOwnerUuid());
+
+        return owner == null ? null : Objects.requireNonNull(owner.getDisplayName()).getString();
     }
 }

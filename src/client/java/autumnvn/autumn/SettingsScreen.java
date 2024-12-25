@@ -10,7 +10,7 @@ import net.minecraft.text.Text;
 public class SettingsScreen extends Screen {
     Screen parent;
     ButtonListWidget list;
-    SimpleOption<?>[] options = new SimpleOption<?>[] {
+    SimpleOption<?>[] options = new SimpleOption<?>[]{
             AutumnClient.options.autoAttack,
             AutumnClient.options.ignorePlayer,
             AutumnClient.options.betterChat,
@@ -51,17 +51,17 @@ public class SettingsScreen extends Screen {
 
         ButtonWidget doneButton = ButtonWidget.builder(ScreenTexts.DONE, button -> {
             AutumnClient.options.save();
-            this.client.setScreen(parent);
-        }).dimensions(this.width / 2 - 100, this.height - 27, 200, 20).build();
+            if (this.client != null) {
+                this.client.setScreen(parent);
+            }
+        }).dimensions(this.width / 2 - 100, this.height - 26, 200, 20).build();
         this.addDrawableChild(doneButton);
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context, mouseY, mouseY, delta);
-        this.list.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, 0xffffff);
         super.render(context, mouseX, mouseY, delta);
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 12, 0xffffff);
     }
 
     @Override
@@ -71,6 +71,8 @@ public class SettingsScreen extends Screen {
 
     @Override
     public void close() {
-        this.client.setScreen(parent);
+        if (this.client != null) {
+            this.client.setScreen(parent);
+        }
     }
 }

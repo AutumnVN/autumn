@@ -1,22 +1,17 @@
 package autumnvn.autumn;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.text.Text;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class Options {
     File file;
@@ -45,21 +40,21 @@ public class Options {
 
     public Options() {
         this.file = new File(AutumnClient.client.runDirectory, "config/autumn.properties");
-        this.options = new HashMap<String, SimpleOption<?>>();
+        this.options = new HashMap<>();
 
         autoAttack = SimpleOption.ofBoolean("Auto Attack", value -> Tooltip.of(Text.of("Automatically attack living entity at crosshair within reach")), false);
         options.put("autoAttack", autoAttack);
         ignorePlayer = SimpleOption.ofBoolean("Ignore Player", value -> Tooltip.of(Text.of("Auto Attack will ignore player")), false);
         options.put("ignorePlayer", ignorePlayer);
-        betterChat = SimpleOption.ofBoolean("Better Chat", value -> Tooltip.of(Text.of("Lengthen chat history to 65535 lines, keep chat/command history on switching world/server & remove chat indicator")), true);
+        betterChat = SimpleOption.ofBoolean("Better Chat", value -> Tooltip.of(Text.of("Lengthen chat history to 65k lines, keep chat/command history on switching world/server & remove chat indicator")), true);
         options.put("betterChat", betterChat);
-        betterNametag = SimpleOption.ofBoolean("Better Nametag", value -> Tooltip.of(Text.of("Add health & gamemode to nametag, make nametag always visible & show targeted entity nametag")), true);
+        betterNametag = SimpleOption.ofBoolean("Better Nametag", value -> Tooltip.of(Text.of("Add health & gamemode to nametag, make player nametag always visible & show recently targeted entity nametag")), true);
         options.put("betterNametag", betterNametag);
         deathCoord = SimpleOption.ofBoolean("Death Coord", value -> Tooltip.of(Text.of("Show death coordinates in chat")), true);
         options.put("deathCoord", deathCoord);
         fullBright = SimpleOption.ofBoolean("Full Bright", value -> Tooltip.of(Text.of("No more darkness")), true);
         options.put("fullBright", fullBright);
-        horseSwim = SimpleOption.ofBoolean("Horse Swim", value -> Tooltip.of(Text.of("Make riding horse swim in water")), true);
+        horseSwim = SimpleOption.ofBoolean("Horse Swim", value -> Tooltip.of(Text.of("Make riding horse swim in water & lava")), true);
         options.put("horseSwim", horseSwim);
         infoHud = SimpleOption.ofBoolean("Info Hud", value -> Tooltip.of(Text.of("Show fps, coordinates, direction, tps, targeted entity health & horse stats on screen, show armor above hotbar, show hunger & xp bar when riding")), true);
         options.put("infoHud", infoHud);
@@ -85,7 +80,7 @@ public class Options {
         options.put("rightClickHarvest", rightClickHarvest);
         thirdPersonNoClip = SimpleOption.ofBoolean("Third Person No Clip", value -> Tooltip.of(Text.of("Let third-person camera clip through blocks")), true);
         options.put("thirdPersonNoClip", thirdPersonNoClip);
-        visibleBarrier = SimpleOption.ofBoolean("Visible Barrier", value -> Tooltip.of(Text.of("Force render barrier block")), true);
+        visibleBarrier = SimpleOption.ofBoolean("Visible Barrier", value -> Tooltip.of(Text.of("Force render barrier block")), true, value -> AutumnClient.client.worldRenderer.reload());
         options.put("visibleBarrier", visibleBarrier);
 
         if (file.exists()) {
@@ -93,15 +88,14 @@ public class Options {
                 reader.lines().forEach(line -> {
                     String[] split = line.split("=");
                     if (split.length != 2) {
-                        Autumn.LOGGER.warn("Invalid line in config file: " + line);
+                        Autumn.LOGGER.warn("Invalid line in config file: {}", line);
                         return;
                     }
                     String key = split[0];
                     String value = split[1];
                     SimpleOption<?> option = options.get(key);
                     if (option == null || value.isEmpty()) {
-                        Autumn.LOGGER.warn("Invalid option in config file: " + line);
-                        return;
+                        Autumn.LOGGER.warn("Invalid option in config file: {}", line);
                     } else {
                         parseOption(option, value);
                     }
@@ -110,14 +104,17 @@ public class Options {
                 Autumn.LOGGER.error("Failed to read config file", e);
             }
         } else {
-            file.getParentFile().mkdirs();
+            boolean mkdirs = file.getParentFile().mkdirs();
+            if (!mkdirs) {
+                Autumn.LOGGER.error("Failed to create config directory");
+            }
             save();
         }
     }
 
     <T> void parseOption(SimpleOption<T> option, String value) {
         DataResult<T> result = option.getCodec().parse(JsonOps.INSTANCE, JsonParser.parseString(value));
-        result.error().ifPresent(e -> Autumn.LOGGER.warn("Failed to parse option: " + e.message()));
+        result.error().ifPresent(e -> Autumn.LOGGER.warn("Failed to parse option: {}", e.message()));
         result.result().ifPresent(option::setValue);
     }
 
