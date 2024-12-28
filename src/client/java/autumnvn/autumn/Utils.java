@@ -13,7 +13,7 @@ import java.util.Objects;
 
 public class Utils {
 
-    private static class TimedEntity {
+    static class TimedEntity {
         long time;
         Entity entity;
 
@@ -23,7 +23,7 @@ public class Utils {
         }
     }
 
-    private static TimedEntity recentTargetedEntity;
+    static TimedEntity recentTargetedEntity;
 
     public static Entity getTargetedEntity() {
         Entity cameraEntity = AutumnClient.client.getCameraEntity();

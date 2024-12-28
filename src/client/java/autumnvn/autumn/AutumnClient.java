@@ -4,6 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -12,6 +13,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.CropBlock;
 import net.minecraft.block.NetherWartBlock;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.input.Input;
+import net.minecraft.client.input.KeyboardInput;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.render.RenderLayer;
@@ -19,6 +22,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.PlayerInput;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult.Type;
 import net.minecraft.util.math.BlockPos;
@@ -29,6 +33,7 @@ public class AutumnClient implements ClientModInitializer {
     public static Options options;
     public static KeyBinding autoAttackKey;
     public static KeyBinding ignorePlayerKey;
+    public static KeyBinding freeCamKey;
     public static KeyBinding settingKey;
     public static KeyBinding zoomKey;
     public static double tps;
@@ -37,15 +42,19 @@ public class AutumnClient implements ClientModInitializer {
     public void onInitializeClient() {
         client = MinecraftClient.getInstance();
         options = new Options();
-        options.autoAttack.setValue(false);
         autoAttackKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Auto Attack", GLFW.GLFW_KEY_R, "Autumn"));
         ignorePlayerKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Ignore Player", GLFW.GLFW_KEY_UNKNOWN, "Autumn"));
+        freeCamKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Free Cam", GLFW.GLFW_KEY_H, "Autumn"));
         settingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Open Autumn Settings", GLFW.GLFW_KEY_BACKSLASH, "Autumn"));
         zoomKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Zoom", GLFW.GLFW_KEY_LEFT_ALT, "Autumn"));
 
         FabricLoader.getInstance().getModContainer("autumn").ifPresent(container -> ResourceManagerHelper.registerBuiltinResourcePack(Identifier.of("autumn", "autumn"), container, ResourcePackActivationType.DEFAULT_ENABLED));
         BlockRenderLayerMap.INSTANCE.putBlock(Blocks.BARRIER, RenderLayer.getTranslucent());
 
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            options.autoAttack.setValue(false);
+            options.freeCam.setValue(false);
+        });
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
             if (client.player == null || client.interactionManager == null || client.world == null) return;
@@ -54,11 +63,21 @@ public class AutumnClient implements ClientModInitializer {
             }
             handleToggleKey(autoAttackKey, options.autoAttack, "Auto Attack");
             handleToggleKey(ignorePlayerKey, options.ignorePlayer, "Ignore Player");
+            handleToggleKey(freeCamKey, options.freeCam, "Free Cam");
 
             // AutoAttack
             if (options.autoAttack.getValue() && client.player.getAttackCooldownProgress(0) >= 1 && client.targetedEntity instanceof LivingEntity livingEntity && livingEntity.isAttackable() && livingEntity.isAlive() && livingEntity.hurtTime == 0 && !(options.ignorePlayer.getValue() && livingEntity instanceof PlayerEntity)) {
                 client.interactionManager.attackEntity(client.player, livingEntity);
                 client.player.swingHand(client.player.getActiveHand());
+            }
+
+            // FreeCam
+            if (AutumnClient.options.freeCam.getValue() && client.player.input instanceof KeyboardInput) {
+                Input input = new Input();
+                input.playerInput = new PlayerInput(false, false, false, false, false, client.player.input.playerInput.sneak(), false);
+                client.player.input = input;
+            } else if (!AutumnClient.options.freeCam.getValue() && !(client.player.input instanceof KeyboardInput)) {
+                client.player.input = new KeyboardInput(client.options);
             }
 
             // RightClickHarvest
@@ -74,7 +93,7 @@ public class AutumnClient implements ClientModInitializer {
         });
     }
 
-    private void handleToggleKey(KeyBinding key, SimpleOption<Boolean> option, String name) {
+    static void handleToggleKey(KeyBinding key, SimpleOption<Boolean> option, String name) {
         if (client.player == null) return;
         while (key.wasPressed()) {
             option.setValue(!option.getValue());

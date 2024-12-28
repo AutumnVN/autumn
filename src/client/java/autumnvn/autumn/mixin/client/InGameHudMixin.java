@@ -190,4 +190,12 @@ public class InGameHudMixin {
 
         return I18n.hasTranslation(key) ? I18n.translate(key) : String.valueOf(amplifier + 1);
     }
+
+    // FreeCam
+    @Inject(method = "getCameraPlayer", at = @At("HEAD"), cancellable = true)
+    private void getCameraPlayer(CallbackInfoReturnable<PlayerEntity> cir) {
+        if (AutumnClient.options.freeCam.getValue()) {
+            cir.setReturnValue(AutumnClient.client.player);
+        }
+    }
 }

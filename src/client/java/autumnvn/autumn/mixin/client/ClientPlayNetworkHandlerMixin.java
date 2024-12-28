@@ -35,4 +35,10 @@ public class ClientPlayNetworkHandlerMixin {
         lastTick = tick;
         lastTime = time;
     }
+
+    // FreeCam
+    @Inject(method = "onPlayerRespawn", at = @At("HEAD"))
+    private void onPlayerRespawn(CallbackInfo ci) {
+        AutumnClient.options.freeCam.setValue(false);
+    }
 }

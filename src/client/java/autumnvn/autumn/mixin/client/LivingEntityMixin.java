@@ -7,6 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -27,6 +28,21 @@ public class LivingEntityMixin {
                     }
                 }
             }
+        }
+    }
+
+    @Shadow
+    public float getHealth() {
+        return 0;
+    }
+
+    // FreeCam
+    @Inject(method = "setHealth", at = @At("HEAD"))
+    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
+    private void setHealth(float health, CallbackInfo ci) {
+        if (AutumnClient.options.freeCam.getValue() && this.equals(AutumnClient.client.player) && getHealth() > health) {
+            AutumnClient.options.freeCam.setValue(false);
+
         }
     }
 }

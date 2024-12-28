@@ -4,6 +4,7 @@ import com.google.gson.JsonParser;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.client.gui.tooltip.Tooltip;
+import net.minecraft.client.input.Input;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.text.Text;
 
@@ -16,12 +17,14 @@ import java.util.Map.Entry;
 public class Options {
     File file;
     Map<String, SimpleOption<?>> options;
+    public FreeCam freeCamEntity;
 
     public SimpleOption<Boolean> autoAttack;
     public SimpleOption<Boolean> ignorePlayer;
     public SimpleOption<Boolean> betterChat;
     public SimpleOption<Boolean> betterNametag;
     public SimpleOption<Boolean> deathCoord;
+    public SimpleOption<Boolean> freeCam;
     public SimpleOption<Boolean> fullBright;
     public SimpleOption<Boolean> horseSwim;
     public SimpleOption<Boolean> infoHud;
@@ -53,6 +56,8 @@ public class Options {
         options.put("betterNametag", betterNametag);
         deathCoord = SimpleOption.ofBoolean("Death Coord", value -> Tooltip.of(Text.of("Show death coordinates in chat")), true);
         options.put("deathCoord", deathCoord);
+        freeCam = SimpleOption.ofBoolean("Free Cam", value -> Tooltip.of(Text.of("Unbind camera from player, allow fly around & clip through blocks")), false, this::freeCamCallback);
+        options.put("freeCam", freeCam);
         fullBright = SimpleOption.ofBoolean("Full Bright", value -> Tooltip.of(Text.of("No more darkness")), true);
         options.put("fullBright", fullBright);
         horseSwim = SimpleOption.ofBoolean("Horse Swim", value -> Tooltip.of(Text.of("Make riding horse swim in water & lava")), true);
@@ -128,6 +133,22 @@ public class Options {
             }
         } catch (FileNotFoundException e) {
             Autumn.LOGGER.error("Failed to create config file", e);
+        }
+    }
+
+    // FreeCam
+    void freeCamCallback(Boolean value) {
+        AutumnClient.client.chunkCullingEnabled = !value;
+        AutumnClient.client.gameRenderer.setRenderHand(!value);
+        if (value) {
+            freeCamEntity = new FreeCam();
+            freeCamEntity.spawn();
+            AutumnClient.client.setCameraEntity(freeCamEntity);
+        } else {
+            AutumnClient.client.setCameraEntity(AutumnClient.client.player);
+            freeCamEntity.despawn();
+            freeCamEntity.input = new Input();
+            freeCamEntity = null;
         }
     }
 }

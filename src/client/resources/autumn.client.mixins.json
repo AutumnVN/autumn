@@ -3,6 +3,7 @@
   "package": "autumnvn.autumn.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "AbstractBlockStateMixin",
     "BackgroundRendererMixin",
     "BarrierBlockMixin",
     "CameraMixin",
@@ -24,7 +25,8 @@
     "SplashOverlayMixin",
     "TitleScreenMixin",
     "ToastManagerMixin",
-    "ToastManagerMixin$Entry"
+    "ToastManagerMixin$Entry",
+    "WorldRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
