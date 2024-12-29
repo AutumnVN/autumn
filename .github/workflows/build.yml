@@ -26,6 +26,6 @@ jobs:
 
       - name: Release
         run: |
-          gh release upload release --clobber build/libs/autumn-1.0.0.jar
+          gh release upload release --clobber build/libs/autumn-1.21.4.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
