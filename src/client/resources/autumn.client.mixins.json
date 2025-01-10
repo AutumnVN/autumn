@@ -21,6 +21,7 @@
     "MinecraftClientMixin",
     "OptionsScreenMixin",
     "PlayerListHudMixin",
+    "ResourcePackSendS2CPacketMixin",
     "SimpleOptionMixin",
     "SplashOverlayMixin",
     "TitleScreenMixin",
