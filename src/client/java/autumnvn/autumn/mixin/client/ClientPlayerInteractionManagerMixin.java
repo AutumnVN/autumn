@@ -9,6 +9,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.EntityTypeTags;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -56,15 +57,39 @@ public class ClientPlayerInteractionManagerMixin {
             slot = player.getInventory().selectedSlot;
             ItemStack stack = player.getMainHandStack();
             Item item = stack.getItem();
-            boolean targetIsUsingShield = target instanceof PlayerEntity playerEntity && playerEntity.getActiveItem().isOf(Items.SHIELD);
-            if (!(item instanceof AxeItem) && targetIsUsingShield && getAxeHotbarSlot(player) != -1) {
+
+            if (getAxeHotbarSlot(player) != -1 && target instanceof PlayerEntity playerEntity && playerEntity.getActiveItem().isOf(Items.SHIELD)) {
                 player.getInventory().selectedSlot = getAxeHotbarSlot(player);
-            } else if (!(item instanceof AxeItem) || !targetIsUsingShield) {
-                if (!(item == Items.MACE && stack.getEnchantments().getEnchantments().contains(RegistryEntry.of(Enchantments.BREACH))) && getBreachMaceHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getArmor() > 8) {
-                    player.getInventory().selectedSlot = getBreachMaceHotbarSlot(player);
-                } else if (!(item instanceof SwordItem && !stack.getEnchantments().getEnchantments().isEmpty()) && getEnchantedSwordHotbarSlot(player) != -1) {
-                    player.getInventory().selectedSlot = getEnchantedSwordHotbarSlot(player);
-                }
+                return;
+            }
+
+            if (getBreachMaceHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getArmor() > 15) {
+                player.getInventory().selectedSlot = getBreachMaceHotbarSlot(player);
+                return;
+            }
+
+            if (getSmiteSwordHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getType().isIn(EntityTypeTags.UNDEAD)) {
+                player.getInventory().selectedSlot = getSmiteSwordHotbarSlot(player);
+                return;
+            }
+
+            if (getBaneOfArthropodsSwordHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getType().isIn(EntityTypeTags.ARTHROPOD)) {
+                player.getInventory().selectedSlot = getBaneOfArthropodsSwordHotbarSlot(player);
+                return;
+            }
+
+            if (getImpalingTridentHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getType().isIn(EntityTypeTags.AQUATIC)) {
+                player.getInventory().selectedSlot = getImpalingTridentHotbarSlot(player);
+                return;
+            }
+
+            if (getEnchantedSwordHotbarSlot(player) != -1) {
+                player.getInventory().selectedSlot = getEnchantedSwordHotbarSlot(player);
+                return;
+            }
+
+            if (getNonWeaponHotbarSlot(player) != -1 && ((item instanceof SwordItem && stack.getEnchantments().getEnchantments().isEmpty()) || (item instanceof AxeItem && !stack.getEnchantments().getEnchantments().contains(RegistryEntry.of(Enchantments.SHARPNESS))) || item instanceof PickaxeItem || item instanceof ShovelItem || item instanceof HoeItem || item instanceof TridentItem || item instanceof MaceItem)) {
+                player.getInventory().selectedSlot = getNonWeaponHotbarSlot(player);
             }
         }
     }
@@ -101,11 +126,59 @@ public class ClientPlayerInteractionManagerMixin {
     }
 
     @Unique
+    int getSmiteSwordHotbarSlot(PlayerEntity player) {
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = player.getInventory().getStack(i);
+            Item item = stack.getItem();
+            if (item instanceof SwordItem && stack.getEnchantments().getEnchantments().contains(RegistryEntry.of(Enchantments.SMITE))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Unique
+    int getBaneOfArthropodsSwordHotbarSlot(PlayerEntity player) {
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = player.getInventory().getStack(i);
+            Item item = stack.getItem();
+            if (item instanceof SwordItem && stack.getEnchantments().getEnchantments().contains(RegistryEntry.of(Enchantments.BANE_OF_ARTHROPODS))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Unique
+    int getImpalingTridentHotbarSlot(PlayerEntity player) {
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = player.getInventory().getStack(i);
+            Item item = stack.getItem();
+            if (item instanceof TridentItem && stack.getEnchantments().getEnchantments().contains(RegistryEntry.of(Enchantments.IMPALING))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Unique
     int getEnchantedSwordHotbarSlot(PlayerEntity player) {
         for (int i = 0; i < 9; i++) {
             ItemStack stack = player.getInventory().getStack(i);
             Item item = stack.getItem();
             if (item instanceof SwordItem && !stack.getEnchantments().getEnchantments().isEmpty()) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Unique
+    int getNonWeaponHotbarSlot(PlayerEntity player) {
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = player.getInventory().getStack(i);
+            Item item = stack.getItem();
+            if (!(item instanceof SwordItem) && !(item instanceof AxeItem) && !(item instanceof PickaxeItem) && !(item instanceof ShovelItem) && !(item instanceof HoeItem) && !(item instanceof TridentItem) && !(item instanceof MaceItem)) {
                 return i;
             }
         }
