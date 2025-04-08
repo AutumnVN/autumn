@@ -2,7 +2,6 @@ package autumnvn.autumn;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.util.hit.EntityHitResult;
@@ -30,7 +29,7 @@ public class Utils {
         if (cameraEntity == null) return null;
 
         double maxDistance = 128;
-        float tickDelta = AutumnClient.client.getRenderTickCounter().getTickDelta(true);
+        float tickDelta = AutumnClient.client.getRenderTickCounter().getTickProgress(true);
         Vec3d vec3d = cameraEntity.getEyePos();
         Vec3d vec3d2 = cameraEntity.getRotationVec(tickDelta).multiply(maxDistance);
         Box box = cameraEntity.getBoundingBox().stretch(vec3d2).expand(1.0);
@@ -55,9 +54,7 @@ public class Utils {
 
     public static String getOwnerName(Entity entity) {
         if (!(entity instanceof TameableEntity tameableEntity)) return null;
-        if (tameableEntity.getOwnerUuid() == null) return null;
-        PlayerEntity owner = entity.getWorld().getPlayerByUuid(tameableEntity.getOwnerUuid());
 
-        return owner == null ? null : Objects.requireNonNull(owner.getDisplayName()).getString();
+        return tameableEntity.getOwner() == null ? null : Objects.requireNonNull(tameableEntity.getOwner().getDisplayName()).getString();
     }
 }

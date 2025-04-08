@@ -10,6 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.EntityTypeTags;
+import net.minecraft.registry.tag.ItemTags;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -54,42 +55,42 @@ public class ClientPlayerInteractionManagerMixin {
     @Inject(method = "attackEntity", at = @At("HEAD"))
     private void attackEntity2(PlayerEntity player, Entity target, CallbackInfo ci) {
         if (AutumnClient.options.autoHitSwap.getValue()) {
-            slot = player.getInventory().selectedSlot;
+            slot = player.getInventory().getSelectedSlot();
             ItemStack stack = player.getMainHandStack();
             Item item = stack.getItem();
 
             if (getAxeHotbarSlot(player) != -1 && target instanceof PlayerEntity playerEntity && playerEntity.getActiveItem().isOf(Items.SHIELD)) {
-                player.getInventory().selectedSlot = getAxeHotbarSlot(player);
+                player.getInventory().setSelectedSlot(getAxeHotbarSlot(player));
                 return;
             }
 
             if (getBreachMaceHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getArmor() > 15) {
-                player.getInventory().selectedSlot = getBreachMaceHotbarSlot(player);
+                player.getInventory().setSelectedSlot(getBreachMaceHotbarSlot(player));
                 return;
             }
 
             if (getSmiteSwordHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getType().isIn(EntityTypeTags.UNDEAD)) {
-                player.getInventory().selectedSlot = getSmiteSwordHotbarSlot(player);
+                player.getInventory().setSelectedSlot(getSmiteSwordHotbarSlot(player));
                 return;
             }
 
             if (getBaneOfArthropodsSwordHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getType().isIn(EntityTypeTags.ARTHROPOD)) {
-                player.getInventory().selectedSlot = getBaneOfArthropodsSwordHotbarSlot(player);
+                player.getInventory().setSelectedSlot(getBaneOfArthropodsSwordHotbarSlot(player));
                 return;
             }
 
             if (getImpalingTridentHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getType().isIn(EntityTypeTags.AQUATIC)) {
-                player.getInventory().selectedSlot = getImpalingTridentHotbarSlot(player);
+                player.getInventory().setSelectedSlot(getImpalingTridentHotbarSlot(player));
                 return;
             }
 
             if (getEnchantedSwordHotbarSlot(player) != -1) {
-                player.getInventory().selectedSlot = getEnchantedSwordHotbarSlot(player);
+                player.getInventory().setSelectedSlot(getEnchantedSwordHotbarSlot(player));
                 return;
             }
 
-            if (getNonWeaponHotbarSlot(player) != -1 && ((item instanceof SwordItem && stack.getEnchantments().getEnchantments().isEmpty()) || (item instanceof AxeItem && !stack.getEnchantments().getEnchantments().contains(RegistryEntry.of(Enchantments.SHARPNESS))) || item instanceof PickaxeItem || item instanceof ShovelItem || item instanceof HoeItem || item instanceof TridentItem || item instanceof MaceItem)) {
-                player.getInventory().selectedSlot = getNonWeaponHotbarSlot(player);
+            if (getNonWeaponHotbarSlot(player) != -1 && ((stack.isIn(ItemTags.SWORDS) && stack.getEnchantments().getEnchantments().isEmpty()) || (item instanceof AxeItem && !stack.getEnchantments().getEnchantments().contains(RegistryEntry.of(Enchantments.SHARPNESS))) || stack.isIn(ItemTags.PICKAXES) || item instanceof ShovelItem || item instanceof HoeItem || item instanceof TridentItem || item instanceof MaceItem)) {
+                player.getInventory().setSelectedSlot(getNonWeaponHotbarSlot(player));
             }
         }
     }
@@ -97,7 +98,7 @@ public class ClientPlayerInteractionManagerMixin {
     @Inject(method = "attackEntity", at = @At("TAIL"))
     private void attackEntity3(PlayerEntity player, Entity target, CallbackInfo ci) {
         if (AutumnClient.options.autoHitSwap.getValue()) {
-            player.getInventory().selectedSlot = slot;
+            player.getInventory().setSelectedSlot(slot);
         }
     }
 
@@ -129,8 +130,7 @@ public class ClientPlayerInteractionManagerMixin {
     int getSmiteSwordHotbarSlot(PlayerEntity player) {
         for (int i = 0; i < 9; i++) {
             ItemStack stack = player.getInventory().getStack(i);
-            Item item = stack.getItem();
-            if (item instanceof SwordItem && stack.getEnchantments().getEnchantments().contains(RegistryEntry.of(Enchantments.SMITE))) {
+            if (stack.isIn(ItemTags.SWORDS) && stack.getEnchantments().getEnchantments().contains(RegistryEntry.of(Enchantments.SMITE))) {
                 return i;
             }
         }
@@ -141,8 +141,7 @@ public class ClientPlayerInteractionManagerMixin {
     int getBaneOfArthropodsSwordHotbarSlot(PlayerEntity player) {
         for (int i = 0; i < 9; i++) {
             ItemStack stack = player.getInventory().getStack(i);
-            Item item = stack.getItem();
-            if (item instanceof SwordItem && stack.getEnchantments().getEnchantments().contains(RegistryEntry.of(Enchantments.BANE_OF_ARTHROPODS))) {
+            if (stack.isIn(ItemTags.SWORDS) && stack.getEnchantments().getEnchantments().contains(RegistryEntry.of(Enchantments.BANE_OF_ARTHROPODS))) {
                 return i;
             }
         }
@@ -165,8 +164,7 @@ public class ClientPlayerInteractionManagerMixin {
     int getEnchantedSwordHotbarSlot(PlayerEntity player) {
         for (int i = 0; i < 9; i++) {
             ItemStack stack = player.getInventory().getStack(i);
-            Item item = stack.getItem();
-            if (item instanceof SwordItem && !stack.getEnchantments().getEnchantments().isEmpty()) {
+            if (stack.isIn(ItemTags.SWORDS) && !stack.getEnchantments().getEnchantments().isEmpty()) {
                 return i;
             }
         }
@@ -178,7 +176,7 @@ public class ClientPlayerInteractionManagerMixin {
         for (int i = 0; i < 9; i++) {
             ItemStack stack = player.getInventory().getStack(i);
             Item item = stack.getItem();
-            if (!(item instanceof SwordItem) && !(item instanceof AxeItem) && !(item instanceof PickaxeItem) && !(item instanceof ShovelItem) && !(item instanceof HoeItem) && !(item instanceof TridentItem) && !(item instanceof MaceItem)) {
+            if (!(stack.isIn(ItemTags.SWORDS)) && !(item instanceof AxeItem) && !(stack.isIn(ItemTags.PICKAXES)) && !(item instanceof ShovelItem) && !(item instanceof HoeItem) && !(item instanceof TridentItem) && !(item instanceof MaceItem)) {
                 return i;
             }
         }

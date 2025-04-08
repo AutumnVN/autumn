@@ -1,9 +1,9 @@
 name: Build
 
 on:
-    push:
-      branches:
-        - main
+  push:
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -26,6 +26,6 @@ jobs:
 
       - name: Release
         run: |
-          gh release upload release --clobber build/libs/autumn-1.21.4.jar
+          gh release upload release --clobber build/libs/autumn-1.21.5.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

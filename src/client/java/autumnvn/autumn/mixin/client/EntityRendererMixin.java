@@ -67,7 +67,7 @@ public class EntityRendererMixin<T extends Entity, S extends EntityRenderState> 
         if (AutumnClient.options.betterNametag.getValue() && original == null) {
             Entity entity = ((EntityRenderState2) state).autumn$getEntity();
             if (entity instanceof LivingEntity livingEntity && (livingEntity instanceof PlayerEntity || livingEntity == Utils.getTargetedEntity())) {
-                return entity.getAttachments().getPointNullable(EntityAttachmentType.NAME_TAG, 0, entity.getLerpedYaw(AutumnClient.client.getRenderTickCounter().getTickDelta(true)));
+                return entity.getAttachments().getPointNullable(EntityAttachmentType.NAME_TAG, 0, entity.getLerpedYaw(AutumnClient.client.getRenderTickCounter().getTickProgress(true)));
             }
         }
 

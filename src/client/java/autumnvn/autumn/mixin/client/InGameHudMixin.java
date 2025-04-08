@@ -9,6 +9,7 @@ import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.JumpingMount;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -114,6 +115,7 @@ public class InGameHudMixin {
         // ArmorHud
         if (AutumnClient.options.infoHud.getValue() && client.player != null && client.interactionManager != null && client.interactionManager.hasStatusBars()) {
             int y = context.getScaledWindowHeight() - 55;
+            EquipmentSlot[] armorSlots = new EquipmentSlot[]{EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD};
             if (client.player.getAir() < client.player.getMaxAir()) {
                 y -= 10;
             }
@@ -121,7 +123,7 @@ public class InGameHudMixin {
                 y -= getHeartRows(getHeartCount(getRiddenEntity())) * 10;
             }
             for (int i = 0, x = 63; i < 4; i++, x -= 15) {
-                renderHotbarItem(context, context.getScaledWindowWidth() / 2 + x, y, tickCounter, client.player, client.player.getInventory().getArmorStack(i), 1);
+                renderHotbarItem(context, context.getScaledWindowWidth() / 2 + x, y, tickCounter, client.player, client.player.getEquippedStack(armorSlots[i]), 1);
             }
         }
     }

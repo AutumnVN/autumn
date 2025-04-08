@@ -75,7 +75,7 @@ public class AutumnClient implements ClientModInitializer {
                     client.player.swingHand(client.player.getActiveHand());
                 } else if (client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() instanceof InteractionEntity interactionEntity) {
                     NbtCompound nbt = interactionEntity.writeNbt(new NbtCompound());
-                    if (nbt.getFloat("width") < 2 && nbt.getFloat("height") > 1.6) {
+                    if (nbt.getFloat("width").orElse(0f) < 2 && nbt.getFloat("height").orElse(0f) > 1.6) {
                         client.interactionManager.attackEntity(client.player, interactionEntity);
                         client.player.swingHand(client.player.getActiveHand());
                     }
