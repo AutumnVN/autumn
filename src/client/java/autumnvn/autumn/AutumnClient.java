@@ -23,6 +23,7 @@ import net.minecraft.entity.decoration.InteractionEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.PlayerInput;
 import net.minecraft.util.hit.BlockHitResult;
@@ -72,12 +73,12 @@ public class AutumnClient implements ClientModInitializer {
             if (options.autoAttack.getValue() && client.player.getAttackCooldownProgress(0) >= 1) {
                 if (client.targetedEntity instanceof LivingEntity livingEntity && livingEntity.isAttackable() && livingEntity.isAlive() && livingEntity.hurtTime == 0 && !(options.ignorePlayer.getValue() && livingEntity instanceof PlayerEntity)) {
                     client.interactionManager.attackEntity(client.player, livingEntity);
-                    client.player.swingHand(client.player.getActiveHand());
+                    client.player.swingHand(Hand.MAIN_HAND);
                 } else if (client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() instanceof InteractionEntity interactionEntity) {
                     NbtCompound nbt = interactionEntity.writeNbt(new NbtCompound());
                     if (nbt.getFloat("width").orElse(0f) < 2 && nbt.getFloat("height").orElse(0f) > 1.6) {
                         client.interactionManager.attackEntity(client.player, interactionEntity);
-                        client.player.swingHand(client.player.getActiveHand());
+                        client.player.swingHand(Hand.MAIN_HAND);
                     }
                 }
             }
@@ -98,7 +99,7 @@ public class AutumnClient implements ClientModInitializer {
                 Block block = client.world.getBlockState(pos).getBlock();
                 if (block instanceof CropBlock cropBlock && cropBlock.isMature(client.world.getBlockState(pos)) || block instanceof NetherWartBlock && client.world.getBlockState(pos).get(NetherWartBlock.AGE) == 3) {
                     client.interactionManager.attackBlock(pos, hitResult.getSide());
-                    client.player.swingHand(client.player.getActiveHand());
+                    client.player.swingHand(Hand.MAIN_HAND);
                 }
             }
         });
