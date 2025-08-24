@@ -79,7 +79,7 @@ public class Options {
         options.put("noFade", noFade);
         noFishingBobber = SimpleOption.ofBoolean("No Fishing Bobber", value -> Tooltip.of(Text.of("Remove fishing bobber when it hooked on your face")), true);
         options.put("noFishingBobber", noFishingBobber);
-        noFog = SimpleOption.ofBoolean("No Fog", value -> Tooltip.of(Text.of("Remove fog, including submersions & potion effects")), true);
+        noFog = SimpleOption.ofBoolean("No Fog", value -> Tooltip.of(Text.of("Remove fog (and sky), including submersions & potion effects")), true);
         options.put("noFog", noFog);
         noInvisible = SimpleOption.ofBoolean("No Invisible", value -> Tooltip.of(Text.of("Force render invisible entities")), true);
         options.put("noInvisible", noInvisible);

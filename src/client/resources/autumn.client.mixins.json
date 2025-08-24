@@ -24,6 +24,7 @@
         "OptionsScreenMixin",
         "PlayerListHudMixin",
         "ResourcePackSendS2CPacketMixin",
+        "SkyRenderingMixin",
         "SplashOverlayMixin",
         "TitleScreenMixin",
         "ToastManagerMixin",
