@@ -6,4 +6,4 @@ Requires [Fabric Loader](https://fabricmc.net/use/), [Fabric API](https://modrin
 
 ## Features
 
-https://github.com/AutumnVN/autumn/blob/main/src/client/java/autumnvn/autumn/Options.java#L50-L100
+https://github.com/AutumnVN/autumn/blob/main/src/client/java/autumnvn/autumn/Options.java#L52-L101

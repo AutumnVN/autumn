@@ -77,11 +77,11 @@ public class AutumnClient implements ClientModInitializer {
             }
 
             // FreeCam
-            if (AutumnClient.options.freeCam.getValue() && client.player.input instanceof KeyboardInput) {
+            if (options.freeCam.getValue() && client.player.input instanceof KeyboardInput) {
                 Input input = new Input();
                 input.playerInput = new PlayerInput(false, false, false, false, false, client.player.input.playerInput.sneak(), false);
                 client.player.input = input;
-            } else if (!AutumnClient.options.freeCam.getValue() && !(client.player.input instanceof KeyboardInput)) {
+            } else if (!options.freeCam.getValue() && !(client.player.input instanceof KeyboardInput)) {
                 client.player.input = new KeyboardInput(client.options);
             }
 

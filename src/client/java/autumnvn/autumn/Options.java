@@ -36,6 +36,7 @@ public class Options {
     public SimpleOption<Boolean> noFishingBobber;
     public SimpleOption<Boolean> noFog;
     public SimpleOption<Boolean> noInvisible;
+    public SimpleOption<Boolean> noJumpDelay;
     public SimpleOption<Boolean> noMineDelay;
     public SimpleOption<Boolean> noToast;
     public SimpleOption<Boolean> noUseDelay;
@@ -82,6 +83,8 @@ public class Options {
         options.put("noFog", noFog);
         noInvisible = SimpleOption.ofBoolean("No Invisible", value -> Tooltip.of(Text.of("Force render invisible entities")), true);
         options.put("noInvisible", noInvisible);
+        noJumpDelay = SimpleOption.ofBoolean("No Jump Delay", value -> Tooltip.of(Text.of("Remove 10-tick delay after jumping")), true);
+        options.put("noJumpDelay", noJumpDelay);
         noMineDelay = SimpleOption.ofBoolean("No Mine Delay", value -> Tooltip.of(Text.of("Remove 6-tick delay when mining blocks")), true);
         options.put("noMineDelay", noMineDelay);
         noToast = SimpleOption.ofBoolean("No Toast", value -> Tooltip.of(Text.of("Remove all in-game toast")), true);

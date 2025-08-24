@@ -28,6 +28,7 @@ public class SettingsScreen extends Screen {
             AutumnClient.options.noFishingBobber,
             AutumnClient.options.noFog,
             AutumnClient.options.noInvisible,
+            AutumnClient.options.noJumpDelay,
             AutumnClient.options.noMineDelay,
             AutumnClient.options.noToast,
             AutumnClient.options.noUseDelay,

@@ -15,6 +15,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin {
 
+    @Shadow
+    private int jumpingCooldown;
+
     // HorseSwim
     @Inject(method = "travelControlled", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;travel(Lnet/minecraft/util/math/Vec3d;)V"))
     private void travelControlled(PlayerEntity controllingPlayer, Vec3d movementInput, CallbackInfo ci) {
@@ -43,6 +46,15 @@ public class LivingEntityMixin {
         if (AutumnClient.options.freeCam.getValue() && this.equals(AutumnClient.client.player) && getHealth() > health) {
             AutumnClient.options.freeCam.setValue(false);
 
+        }
+    }
+
+    // NoJumpDelay
+    @Inject(method = "tickMovement", at = @At("HEAD"))
+    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
+    private void tickMovement(CallbackInfo ci) {
+        if (AutumnClient.options.noJumpDelay.getValue() && this.equals(AutumnClient.client.player)) {
+            this.jumpingCooldown = 0;
         }
     }
 }
