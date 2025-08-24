@@ -1,10 +1,10 @@
 package autumnvn.autumn;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -17,20 +17,19 @@ import net.minecraft.client.input.Input;
 import net.minecraft.client.input.KeyboardInput;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.SimpleOption;
-import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.BlockRenderLayer;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.InteractionEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.PlayerInput;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult.Type;
 import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
+
+import static autumnvn.autumn.Autumn.MOD_ID;
 
 public class AutumnClient implements ClientModInitializer {
     public static MinecraftClient client;
@@ -52,8 +51,8 @@ public class AutumnClient implements ClientModInitializer {
         settingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Open Autumn Settings", GLFW.GLFW_KEY_BACKSLASH, "Autumn"));
         zoomKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Zoom", GLFW.GLFW_KEY_LEFT_ALT, "Autumn"));
 
-        FabricLoader.getInstance().getModContainer("autumn").ifPresent(container -> ResourceManagerHelper.registerBuiltinResourcePack(Identifier.of("autumn", "autumn"), container, ResourcePackActivationType.DEFAULT_ENABLED));
-        BlockRenderLayerMap.INSTANCE.putBlock(Blocks.BARRIER, RenderLayer.getTranslucent());
+        FabricLoader.getInstance().getModContainer(MOD_ID).ifPresent(container -> ResourceManagerHelper.registerBuiltinResourcePack(Identifier.of("autumn", "autumn"), container, Text.literal("Autumn"), ResourcePackActivationType.DEFAULT_ENABLED));
+        BlockRenderLayerMap.putBlock(Blocks.BARRIER, BlockRenderLayer.TRANSLUCENT);
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             options.autoAttack.setValue(false);
@@ -74,12 +73,6 @@ public class AutumnClient implements ClientModInitializer {
                 if (client.targetedEntity instanceof LivingEntity livingEntity && livingEntity.isAttackable() && livingEntity.isAlive() && livingEntity.hurtTime == 0 && !(options.ignorePlayer.getValue() && livingEntity instanceof PlayerEntity)) {
                     client.interactionManager.attackEntity(client.player, livingEntity);
                     client.player.swingHand(Hand.MAIN_HAND);
-                } else if (client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() instanceof InteractionEntity interactionEntity) {
-                    NbtCompound nbt = interactionEntity.writeNbt(new NbtCompound());
-                    if (nbt.getFloat("width").orElse(0f) < 2 && nbt.getFloat("height").orElse(0f) > 1.6) {
-                        client.interactionManager.attackEntity(client.player, interactionEntity);
-                        client.player.swingHand(Hand.MAIN_HAND);
-                    }
                 }
             }
 

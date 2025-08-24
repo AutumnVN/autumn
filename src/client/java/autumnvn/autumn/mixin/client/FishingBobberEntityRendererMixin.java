@@ -1,7 +1,7 @@
 package autumnvn.autumn.mixin.client;
 
 import autumnvn.autumn.AutumnClient;
-import autumnvn.autumn.interfaces.EntityRenderState2;
+import autumnvn.autumn.interfaces.IEntityRenderState;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.FishingBobberEntityRenderer;
 import net.minecraft.client.render.entity.state.FishingBobberEntityState;
@@ -19,7 +19,7 @@ public class FishingBobberEntityRendererMixin {
     // NoFishingBobber
     @Inject(method = "render(Lnet/minecraft/client/render/entity/state/FishingBobberEntityState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("HEAD"), cancellable = true)
     private void render(FishingBobberEntityState fishingBobberEntityState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
-        Entity entity = ((EntityRenderState2) fishingBobberEntityState).autumn$getEntity();
+        Entity entity = ((IEntityRenderState) fishingBobberEntityState).autumn$getEntity();
         if (AutumnClient.options.noFishingBobber.getValue() && ((FishingBobberEntity) entity).getHookedEntity() == AutumnClient.client.player) {
             ci.cancel();
         }

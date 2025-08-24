@@ -28,7 +28,7 @@ public class ChatHudMixin {
         }
     }
 
-    @ModifyVariable(method = "render", at = @At("STORE"))
+    @ModifyVariable(method = "method_71992", at = @At("STORE"))
     public MessageIndicator messageIndicator(MessageIndicator original) {
         return AutumnClient.options.betterChat.getValue() ? null : original;
     }

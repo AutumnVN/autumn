@@ -2,7 +2,7 @@ package autumnvn.autumn.interfaces;
 
 import net.minecraft.entity.Entity;
 
-public interface EntityRenderState2 {
+public interface IEntityRenderState {
 
     Entity autumn$getEntity();
 

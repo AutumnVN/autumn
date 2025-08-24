@@ -2,7 +2,7 @@ package autumnvn.autumn.mixin.client;
 
 import autumnvn.autumn.AutumnClient;
 import autumnvn.autumn.Utils;
-import autumnvn.autumn.interfaces.EntityRenderState2;
+import autumnvn.autumn.interfaces.IEntityRenderState;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
@@ -39,11 +39,12 @@ public class EntityRendererMixin<T extends Entity, S extends EntityRenderState> 
     // BetterNametag
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void render(S state, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        Entity entity = ((EntityRenderState2) state).autumn$getEntity();
+        Entity entity = ((IEntityRenderState) state).autumn$getEntity();
         if (AutumnClient.options.betterNametag.getValue() && entity instanceof LivingEntity livingEntity && (livingEntity instanceof PlayerEntity || livingEntity == Utils.getTargetedEntity())) {
-            EntityRenderState.LeashData leashData = state.leashData;
-            if (leashData != null) {
-                renderLeash(matrices, vertexConsumers, leashData);
+            if (state.leashDatas != null) {
+                for (EntityRenderState.LeashData leashData : state.leashDatas) {
+                    renderLeash(matrices, vertexConsumers, leashData);
+                }
             }
 
             float health = livingEntity.getHealth() + livingEntity.getAbsorptionAmount();
@@ -65,7 +66,7 @@ public class EntityRendererMixin<T extends Entity, S extends EntityRenderState> 
     @ModifyVariable(method = "renderLabelIfPresent", at = @At("STORE"))
     private Vec3d labelNamePos(Vec3d original, S state) {
         if (AutumnClient.options.betterNametag.getValue() && original == null) {
-            Entity entity = ((EntityRenderState2) state).autumn$getEntity();
+            Entity entity = ((IEntityRenderState) state).autumn$getEntity();
             if (entity instanceof LivingEntity livingEntity && (livingEntity instanceof PlayerEntity || livingEntity == Utils.getTargetedEntity())) {
                 return entity.getAttachments().getPointNullable(EntityAttachmentType.NAME_TAG, 0, entity.getLerpedYaw(AutumnClient.client.getRenderTickCounter().getTickProgress(true)));
             }
@@ -74,7 +75,7 @@ public class EntityRendererMixin<T extends Entity, S extends EntityRenderState> 
         return original;
     }
 
-    @ModifyArgs(method = "renderLabelIfPresent", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;draw(Lnet/minecraft/text/Text;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;II)I", ordinal = 0))
+    @ModifyArgs(method = "renderLabelIfPresent", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;draw(Lnet/minecraft/text/Text;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;II)V", ordinal = 0))
     private void draw(Args args) {
         if (AutumnClient.options.betterNametag.getValue()) {
             args.set(3, 0xaaffffff);
@@ -85,7 +86,7 @@ public class EntityRendererMixin<T extends Entity, S extends EntityRenderState> 
     @Inject(method = "updateRenderState", at = @At("HEAD"))
     private void updateRenderState(T entity, S state, float tickDelta, CallbackInfo ci) {
         if (AutumnClient.options.betterNametag.getValue()) {
-            ((EntityRenderState2) state).autumn$setEntity(entity);
+            ((IEntityRenderState) state).autumn$setEntity(entity);
         }
     }
 }

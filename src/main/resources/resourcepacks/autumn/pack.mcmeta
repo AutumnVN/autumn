@@ -1,7 +1,10 @@
 {
-	"pack": {
-		"pack_format": 34,
-		"supported_formats": [ 34, 55 ],
-		"description": "NoGreenNausea, NoTotemPop, VisibleBarrier, VisiblePowderSnow"
-	}
+    "pack": {
+        "pack_format": 34,
+        "supported_formats": [
+            34,
+            64
+        ],
+        "description": "NoGreenNausea, NoTotemPop, RedTrappedChest, VisibleBarrier, PowderSnowBorder"
+    }
 }

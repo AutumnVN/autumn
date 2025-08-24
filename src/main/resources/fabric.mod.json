@@ -1,41 +1,41 @@
 {
-  "schemaVersion": 1,
-  "id": "autumn",
-  "version": "${version}",
-  "name": "Autumn",
-  "description": "",
-  "authors": [
-    "AutumnVN"
-  ],
-  "contact": {
-    "homepage": "https://chino.pages.dev/",
-    "sources": "https://github.com/AutumnVN/autumn"
-  },
-  "license": "GPL-3.0",
-  "icon": "assets/autumn/icon.png",
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "autumnvn.autumn.Autumn"
+    "schemaVersion": 1,
+    "id": "autumn",
+    "version": "${version}",
+    "name": "Autumn",
+    "description": "",
+    "authors": [
+        "AutumnVN"
     ],
-    "client": [
-      "autumnvn.autumn.AutumnClient"
+    "contact": {
+        "homepage": "https://chino.pages.dev/",
+        "sources": "https://github.com/AutumnVN/autumn"
+    },
+    "license": "GPL-3.0",
+    "icon": "assets/autumn/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "autumnvn.autumn.Autumn"
+        ],
+        "client": [
+            "autumnvn.autumn.AutumnClient"
+        ],
+        "modmenu": [
+            "autumnvn.autumn.ModMenuApiImpl"
+        ]
+    },
+    "mixins": [
+        "autumn.mixins.json",
+        {
+            "config": "autumn.client.mixins.json",
+            "environment": "client"
+        }
     ],
-    "modmenu": [
-      "autumnvn.autumn.ModMenuApiImpl"
-    ]
-  },
-  "mixins": [
-    "autumn.mixins.json",
-    {
-      "config": "autumn.client.mixins.json",
-      "environment": "client"
+    "depends": {
+        "fabricloader": ">=0.17.2",
+        "minecraft": "~1.21.8",
+        "java": ">=21",
+        "fabric-api": "*"
     }
-  ],
-  "depends": {
-    "fabricloader": ">=0.16.12",
-    "minecraft": ">=1.21.5",
-    "java": ">=21",
-    "fabric-api": "*"
-  }
 }

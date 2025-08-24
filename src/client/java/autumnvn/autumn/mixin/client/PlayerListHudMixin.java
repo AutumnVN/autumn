@@ -29,11 +29,11 @@ public class PlayerListHudMixin {
                     ping + "ms",
                     x + width - client.textRenderer.getWidth(ping + "ms"),
                     y,
-                    ping > 1000 ? 0xaa0000
-                            : ping > 600 ? 0xff5555
-                            : ping > 300 ? 0xffaa00
-                            : ping > 150 ? 0xffff55
-                            : 0x55ff55
+                    ping > 1000 ? 0xaa0000ff
+                            : ping > 600 ? 0xff5555ff
+                            : ping > 300 ? 0xffaa00ff
+                            : ping > 150 ? 0xffff55ff
+                            : 0x55ff55ff
             );
             ci.cancel();
         }

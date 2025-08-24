@@ -9,18 +9,35 @@ import net.minecraft.client.tutorial.TutorialManager;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MinecraftClient.class)
 public class MinecraftClientMixin {
 
+    @Unique
+    private boolean delayFirstUse = false;
+
     // NoUseDelay
     @ModifyConstant(method = "doItemUse", constant = @Constant(intValue = 4))
     private int itemUseCooldown(int original) {
-        return AutumnClient.options.noUseDelay.getValue() ? 0 : original;
+        if (AutumnClient.options.noUseDelay.getValue()) {
+            if (!delayFirstUse) {
+                delayFirstUse = true;
+                return original;
+            }
+            return 0;
+        }
+        return original;
+    }
+
+    @Inject(method = "handleInputEvents", at = @At("TAIL"))
+    private void onHandleInputEvents(CallbackInfo ci) {
+        MinecraftClient client = (MinecraftClient) (Object) this;
+        if (!client.options.useKey.isPressed()) {
+            delayFirstUse = false;
+        }
     }
 
     @Final

@@ -9,6 +9,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.server.ServerLinks;
+import net.minecraft.util.PlayerInput;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
@@ -48,7 +49,7 @@ public class FreeCam extends ClientPlayerEntity {
                 networkHandler,
                 Objects.requireNonNull(AutumnClient.client.player).getStatHandler(),
                 AutumnClient.client.player.getRecipeBook(),
-                false,
+                PlayerInput.DEFAULT,
                 false
         );
         setId(-1);

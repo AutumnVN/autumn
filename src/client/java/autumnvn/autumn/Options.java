@@ -45,7 +45,7 @@ public class Options {
     public SimpleOption<Boolean> visibleBarrier;
 
     public Options() {
-        this.file = new File(AutumnClient.client.runDirectory, "config/autumn.properties");
+        this.file = new File(AutumnClient.client.runDirectory, "config/autumn.txt");
         this.options = new HashMap<>();
 
         autoAttack = SimpleOption.ofBoolean("Auto Attack", value -> Tooltip.of(Text.of("Automatically attack living entity at crosshair within reach")), false);
@@ -68,7 +68,7 @@ public class Options {
         options.put("fullBright", fullBright);
         horseSwim = SimpleOption.ofBoolean("Horse Swim", value -> Tooltip.of(Text.of("Make riding horse swim in water & lava")), true);
         options.put("horseSwim", horseSwim);
-        infoHud = SimpleOption.ofBoolean("Info Hud", value -> Tooltip.of(Text.of("Show fps, coordinates, direction, tps, targeted entity health & horse stats on screen, show armor above hotbar, show hunger & xp bar when riding, show status effect amplifier & duration")), true);
+        infoHud = SimpleOption.ofBoolean("Info Hud", value -> Tooltip.of(Text.of("Show fps, coordinates, direction, tps, targeted entity health, armor & horse stats on screen, show armor above hotbar, show hunger & xp bar when riding, show status effect amplifier & duration")), true);
         options.put("infoHud", infoHud);
         instantSneak = SimpleOption.ofBoolean("Instant Sneak", value -> Tooltip.of(Text.of("Instantly sneak when holding shift, no animation")), true);
         options.put("instantSneak", instantSneak);
@@ -86,7 +86,7 @@ public class Options {
         options.put("noMineDelay", noMineDelay);
         noToast = SimpleOption.ofBoolean("No Toast", value -> Tooltip.of(Text.of("Remove all in-game toast")), true);
         options.put("noToast", noToast);
-        noUseDelay = SimpleOption.ofBoolean("No Use Delay", value -> Tooltip.of(Text.of("Remove 4-tick delay when using items")), false);
+        noUseDelay = SimpleOption.ofBoolean("No Use Delay", value -> Tooltip.of(Text.of("Remove 4-tick delay when using items (has delay on first use incase you only want to click once)")), true);
         options.put("noUseDelay", noUseDelay);
         pingNumber = SimpleOption.ofBoolean("Ping Number", value -> Tooltip.of(Text.of("Show ping number on tab list")), true);
         options.put("pingNumber", pingNumber);
@@ -100,7 +100,7 @@ public class Options {
         if (file.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
                 reader.lines().forEach(line -> {
-                    String[] split = line.split("=");
+                    String[] split = line.split(":");
                     if (split.length != 2) {
                         Autumn.LOGGER.warn("Invalid line in config file: {}", line);
                         return;
@@ -135,7 +135,7 @@ public class Options {
     void save() {
         try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
             for (Entry<String, SimpleOption<?>> option : options.entrySet()) {
-                writer.println(option.getKey() + "=" + option.getValue().getValue());
+                writer.println(option.getKey() + ":" + option.getValue().getValue());
             }
         } catch (FileNotFoundException e) {
             Autumn.LOGGER.error("Failed to create config file", e);
@@ -145,7 +145,6 @@ public class Options {
     // FreeCam
     void freeCamCallback(Boolean value) {
         AutumnClient.client.chunkCullingEnabled = !value;
-        AutumnClient.client.gameRenderer.setRenderHand(!value);
         if (value) {
             freeCamEntity = new FreeCam();
             freeCamEntity.spawn();
