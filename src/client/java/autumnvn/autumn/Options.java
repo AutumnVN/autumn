@@ -25,6 +25,7 @@ public class Options {
     public SimpleOption<Boolean> autoSprint;
     public SimpleOption<Boolean> betterChat;
     public SimpleOption<Boolean> betterNametag;
+    public SimpleOption<Boolean> boat360;
     public SimpleOption<Boolean> deathCoord;
     public SimpleOption<Boolean> freeCam;
     public SimpleOption<Boolean> fullBright;
@@ -61,6 +62,8 @@ public class Options {
         options.put("betterChat", betterChat);
         betterNametag = SimpleOption.ofBoolean("Better Nametag", value -> Tooltip.of(Text.of("Add health & gamemode to nametag, make player nametag always visible & show recently targeted entity nametag")), true);
         options.put("betterNametag", betterNametag);
+        boat360 = SimpleOption.ofBoolean("Boat 360", value -> Tooltip.of(Text.of("Allow rotate 360 degrees when riding boat")), true);
+        options.put("boat360", boat360);
         deathCoord = SimpleOption.ofBoolean("Death Coord", value -> Tooltip.of(Text.of("Show death coordinates in chat")), true);
         options.put("deathCoord", deathCoord);
         freeCam = SimpleOption.ofBoolean("Free Cam", value -> Tooltip.of(Text.of("Unbind camera from player, allow fly around & clip through blocks")), false, this::freeCamCallback);

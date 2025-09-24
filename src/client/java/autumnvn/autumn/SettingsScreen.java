@@ -17,6 +17,7 @@ public class SettingsScreen extends Screen {
             AutumnClient.options.autoSprint,
             AutumnClient.options.betterChat,
             AutumnClient.options.betterNametag,
+            AutumnClient.options.boat360,
             AutumnClient.options.deathCoord,
             AutumnClient.options.freeCam,
             AutumnClient.options.fullBright,
