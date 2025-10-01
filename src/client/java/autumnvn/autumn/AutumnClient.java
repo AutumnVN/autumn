@@ -45,11 +45,13 @@ public class AutumnClient implements ClientModInitializer {
     public void onInitializeClient() {
         client = MinecraftClient.getInstance();
         options = new Options();
-        autoAttackKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Auto Attack", GLFW.GLFW_KEY_R, "Autumn"));
-        ignorePlayerKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Ignore Player", GLFW.GLFW_KEY_UNKNOWN, "Autumn"));
-        freeCamKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Free Cam", GLFW.GLFW_KEY_H, "Autumn"));
-        settingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Open Autumn Settings", GLFW.GLFW_KEY_BACKSLASH, "Autumn"));
-        zoomKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Zoom", GLFW.GLFW_KEY_LEFT_ALT, "Autumn"));
+
+        KeyBinding.Category category = KeyBinding.Category.create(Identifier.of("autumn:autumn"));
+        autoAttackKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Auto Attack", GLFW.GLFW_KEY_R, category));
+        ignorePlayerKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Ignore Player", GLFW.GLFW_KEY_UNKNOWN, category));
+        freeCamKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Free Cam", GLFW.GLFW_KEY_H, category));
+        settingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Open Autumn Settings", GLFW.GLFW_KEY_BACKSLASH, category));
+        zoomKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Zoom", GLFW.GLFW_KEY_LEFT_ALT, category));
 
         FabricLoader.getInstance().getModContainer(MOD_ID).ifPresent(container -> ResourceManagerHelper.registerBuiltinResourcePack(Identifier.of("autumn", "autumn"), container, Text.literal("Autumn"), ResourcePackActivationType.DEFAULT_ENABLED));
         BlockRenderLayerMap.putBlock(Blocks.BARRIER, BlockRenderLayer.TRANSLUCENT);

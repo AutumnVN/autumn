@@ -46,10 +46,11 @@ public class ButtonListWidget extends ElementListWidget<ButtonListWidget.ButtonE
             return new ButtonEntry(ImmutableMap.of(firstOption, firstOption.createWidget(AutumnClient.client.options, width / 2 - 155, 0, 150), secondOption, secondOption.createWidget(AutumnClient.client.options, width / 2 + 5, 0, 150)));
         }
 
-        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        @Override
+        public void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float deltaTicks) {
             this.buttons.forEach(button -> {
-                button.setY(y);
-                button.render(context, mouseX, mouseY, tickDelta);
+                button.setY(getContentY());
+                button.render(context, mouseX, mouseY, deltaTicks);
             });
         }
 

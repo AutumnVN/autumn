@@ -19,6 +19,8 @@
         "FogRendererMixin",
         "GameRendererMixin",
         "InGameHudMixin",
+        "LabelCommandRendererCommandsAccessor",
+        "LabelCommandRendererCommandsMixin",
         "LightmapTextureManagerMixin",
         "LivingEntityMixin",
         "MinecraftClientMixin",

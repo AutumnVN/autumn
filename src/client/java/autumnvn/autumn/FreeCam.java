@@ -6,6 +6,7 @@ import net.minecraft.client.input.KeyboardInput;
 import net.minecraft.client.network.ClientConnectionState;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.world.ClientChunkLoadProgress;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.server.ServerLinks;
@@ -23,6 +24,7 @@ public class FreeCam extends ClientPlayerEntity {
             AutumnClient.client,
             Objects.requireNonNull(AutumnClient.client.getNetworkHandler()).getConnection(),
             new ClientConnectionState(
+                    new ClientChunkLoadProgress(),
                     new GameProfile(UUID.randomUUID(), "FreeCam"),
                     AutumnClient.client.getTelemetryManager().createWorldSession(false, null, null),
                     AutumnClient.client.getNetworkHandler().getRegistryManager(),
@@ -33,7 +35,9 @@ public class FreeCam extends ClientPlayerEntity {
                     Collections.emptyMap(),
                     AutumnClient.client.inGameHud.getChatHud().toChatState(),
                     Collections.emptyMap(),
-                    ServerLinks.EMPTY
+                    ServerLinks.EMPTY,
+                    Collections.emptyMap(),
+                    false
             )
     ) {
 
@@ -57,24 +61,20 @@ public class FreeCam extends ClientPlayerEntity {
         getAbilities().flying = true;
         input = new KeyboardInput(AutumnClient.client.options);
         refreshPositionAndAngles(
-                AutumnClient.client.player.getPos().x,
-                AutumnClient.client.player.getPos().y,
-                AutumnClient.client.player.getPos().z,
+                AutumnClient.client.player.getX(),
+                AutumnClient.client.player.getY(),
+                AutumnClient.client.player.getZ(),
                 AutumnClient.client.player.getYaw(),
                 AutumnClient.client.player.getPitch()
         );
     }
 
     public void spawn() {
-        if (clientWorld != null) {
-            clientWorld.addEntity(this);
-        }
+        Objects.requireNonNull(AutumnClient.client.world).addEntity(this);
     }
 
     public void despawn() {
-        if (clientWorld != null) {
-            clientWorld.removeEntity(getId(), RemovalReason.DISCARDED);
-        }
+        Objects.requireNonNull(AutumnClient.client.world).removeEntity(getId(), RemovalReason.DISCARDED);
     }
 
     @Override
