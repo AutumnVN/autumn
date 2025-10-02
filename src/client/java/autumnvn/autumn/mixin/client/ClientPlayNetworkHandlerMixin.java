@@ -28,7 +28,7 @@ public class ClientPlayNetworkHandlerMixin {
             if (passedTick > 0 && passedTime > 0) {
                 long mspt = passedTime / passedTick / 1000000;
                 if (mspt > 0) {
-                    AutumnClient.tps = Math.min(1000 / mspt, 20);
+                    AutumnClient.tps = Math.min(1000.0 / mspt, 20.0);
                 }
             }
         }
