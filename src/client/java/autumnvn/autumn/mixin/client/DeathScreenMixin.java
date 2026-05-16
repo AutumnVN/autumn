@@ -1,12 +1,12 @@
 package autumnvn.autumn.mixin.client;
 
-import autumnvn.autumn.AutumnClient;
-import net.minecraft.client.gui.screen.DeathScreen;
-import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import autumnvn.autumn.AutumnClient;
+import net.minecraft.client.gui.screen.DeathScreen;
+import net.minecraft.text.Text;
 
 @Mixin(DeathScreen.class)
 public class DeathScreenMixin {
@@ -21,8 +21,8 @@ public class DeathScreenMixin {
                                 AutumnClient.client.player.getBlockX(),
                                 AutumnClient.client.player.getBlockY(),
                                 AutumnClient.client.player.getBlockZ(),
-                                AutumnClient.client.world.getRegistryKey().getValue().toString().split(":")[1])
-                ), false);
+                                AutumnClient.client.world.getRegistryKey().getValue().toString().split(":")[1])),
+                        false);
             }
         }
     }

@@ -1,18 +1,16 @@
 package autumnvn.autumn;
 
+import java.util.Objects;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.Objects;
-
 public class Utils {
 
-    static class TimedEntity {
+    private static class TimedEntity {
         long time;
         Entity entity;
 
@@ -22,18 +20,18 @@ public class Utils {
         }
     }
 
-    static TimedEntity recentTargetedEntity;
+    private static TimedEntity recentTargetedEntity;
 
-    public static Entity getTargetedEntity() {
+    public static Entity getTargetedEntity(float tickDelta) {
         Entity cameraEntity = AutumnClient.client.getCameraEntity();
-        if (cameraEntity == null) return null;
+        if (cameraEntity == null)
+            return null;
 
         double maxDistance = 128;
-        float tickDelta = AutumnClient.client.getRenderTickCounter().getTickProgress(true);
         Vec3d vec3d = cameraEntity.getEyePos();
         Vec3d vec3d2 = cameraEntity.getRotationVec(tickDelta).multiply(maxDistance);
         Box box = cameraEntity.getBoundingBox().stretch(vec3d2).expand(1.0);
-        EntityHitResult entityHitResult = ProjectileUtil.raycast(cameraEntity, vec3d, vec3d.add(vec3d2), box, EntityPredicates.CAN_HIT, maxDistance * maxDistance);
+        EntityHitResult entityHitResult = ProjectileUtil.raycast(cameraEntity, vec3d, vec3d.add(vec3d2), box, entity -> !entity.isSpectator() && entity.canHit(), maxDistance * maxDistance);
 
         if (entityHitResult != null) {
             recentTargetedEntity = new TimedEntity(entityHitResult.getEntity());
@@ -53,7 +51,8 @@ public class Utils {
     }
 
     public static String getOwnerName(Entity entity) {
-        if (!(entity instanceof TameableEntity tameableEntity)) return null;
+        if (!(entity instanceof TameableEntity tameableEntity))
+            return null;
 
         return tameableEntity.getOwner() == null ? null : Objects.requireNonNull(tameableEntity.getOwner().getDisplayName()).getString();
     }

@@ -10,7 +10,7 @@ import net.minecraft.text.Text;
 public class SettingsScreen extends Screen {
     Screen parent;
     ButtonListWidget list;
-    SimpleOption<?>[] options = new SimpleOption<?>[]{
+    SimpleOption<?>[] options = new SimpleOption<?>[] {
             AutumnClient.options.autoAttack,
             AutumnClient.options.ignorePlayer,
             AutumnClient.options.autoHitSwap,
@@ -67,8 +67,10 @@ public class SettingsScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        this.renderBackground(context, mouseY, mouseY, delta);
+        this.list.render(context, mouseX, mouseY, delta);
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 12, 0xffffff);
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 12, 0xffffffff);
     }
 
     @Override

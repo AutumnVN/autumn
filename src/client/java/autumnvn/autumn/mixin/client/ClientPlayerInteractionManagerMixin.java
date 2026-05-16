@@ -1,5 +1,15 @@
 package autumnvn.autumn.mixin.client;
 
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import autumnvn.autumn.AutumnClient;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
@@ -7,16 +17,17 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.*;
+import net.minecraft.item.AxeItem;
+import net.minecraft.item.HoeItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.MaceItem;
+import net.minecraft.item.ShovelItem;
+import net.minecraft.item.TridentItem;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.registry.tag.ItemTags;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.*;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayerInteractionManager.class)
 public class ClientPlayerInteractionManagerMixin {
@@ -55,42 +66,42 @@ public class ClientPlayerInteractionManagerMixin {
     @Inject(method = "attackEntity", at = @At("HEAD"))
     private void attackEntity2(PlayerEntity player, Entity target, CallbackInfo ci) {
         if (AutumnClient.options.autoHitSwap.getValue()) {
-            slot = player.getInventory().getSelectedSlot();
+            slot = player.getInventory().selectedSlot;
             ItemStack stack = player.getMainHandStack();
             Item item = stack.getItem();
 
             if (getAxeHotbarSlot(player) != -1 && target instanceof PlayerEntity playerEntity && playerEntity.getActiveItem().isOf(Items.SHIELD)) {
-                player.getInventory().setSelectedSlot(getAxeHotbarSlot(player));
+                player.getInventory().selectedSlot = getAxeHotbarSlot(player);
                 return;
             }
 
             if (getBreachMaceHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getArmor() > 15) {
-                player.getInventory().setSelectedSlot(getBreachMaceHotbarSlot(player));
+                player.getInventory().selectedSlot = getBreachMaceHotbarSlot(player);
                 return;
             }
 
             if (getSmiteSwordHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getType().isIn(EntityTypeTags.UNDEAD)) {
-                player.getInventory().setSelectedSlot(getSmiteSwordHotbarSlot(player));
+                player.getInventory().selectedSlot = getSmiteSwordHotbarSlot(player);
                 return;
             }
 
             if (getBaneOfArthropodsSwordHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getType().isIn(EntityTypeTags.ARTHROPOD)) {
-                player.getInventory().setSelectedSlot(getBaneOfArthropodsSwordHotbarSlot(player));
+                player.getInventory().selectedSlot = getBaneOfArthropodsSwordHotbarSlot(player);
                 return;
             }
 
             if (getImpalingTridentHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getType().isIn(EntityTypeTags.AQUATIC)) {
-                player.getInventory().setSelectedSlot(getImpalingTridentHotbarSlot(player));
+                player.getInventory().selectedSlot = getImpalingTridentHotbarSlot(player);
                 return;
             }
 
             if (getEnchantedSwordHotbarSlot(player) != -1) {
-                player.getInventory().setSelectedSlot(getEnchantedSwordHotbarSlot(player));
+                player.getInventory().selectedSlot = getEnchantedSwordHotbarSlot(player);
                 return;
             }
 
             if (getNonWeaponHotbarSlot(player) != -1 && ((stack.isIn(ItemTags.SWORDS) && stack.getEnchantments().getEnchantments().isEmpty()) || (item instanceof AxeItem && !stack.getEnchantments().getEnchantments().contains(RegistryEntry.of(Enchantments.SHARPNESS))) || stack.isIn(ItemTags.PICKAXES) || item instanceof ShovelItem || item instanceof HoeItem || item instanceof TridentItem || item instanceof MaceItem)) {
-                player.getInventory().setSelectedSlot(getNonWeaponHotbarSlot(player));
+                player.getInventory().selectedSlot = getNonWeaponHotbarSlot(player);
             }
         }
     }
@@ -98,7 +109,7 @@ public class ClientPlayerInteractionManagerMixin {
     @Inject(method = "attackEntity", at = @At("TAIL"))
     private void attackEntity3(PlayerEntity player, Entity target, CallbackInfo ci) {
         if (AutumnClient.options.autoHitSwap.getValue()) {
-            player.getInventory().setSelectedSlot(slot);
+            player.getInventory().selectedSlot = slot;
         }
     }
 

@@ -1,10 +1,12 @@
 package autumnvn.autumn;
 
+import static autumnvn.autumn.Autumn.MOD_ID;
+import org.lwjgl.glfw.GLFW;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -17,19 +19,15 @@ import net.minecraft.client.input.Input;
 import net.minecraft.client.input.KeyboardInput;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.SimpleOption;
-import net.minecraft.client.render.BlockRenderLayer;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.PlayerInput;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult.Type;
 import net.minecraft.util.math.BlockPos;
-import org.lwjgl.glfw.GLFW;
-
-import static autumnvn.autumn.Autumn.MOD_ID;
 
 public class AutumnClient implements ClientModInitializer {
     public static MinecraftClient client;
@@ -46,15 +44,15 @@ public class AutumnClient implements ClientModInitializer {
         client = MinecraftClient.getInstance();
         options = new Options();
 
-        KeyBinding.Category category = KeyBinding.Category.create(Identifier.of("autumn:autumn"));
-        autoAttackKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Auto Attack", GLFW.GLFW_KEY_R, category));
-        ignorePlayerKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Ignore Player", GLFW.GLFW_KEY_UNKNOWN, category));
-        freeCamKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Free Cam", GLFW.GLFW_KEY_H, category));
-        settingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Open Autumn Settings", GLFW.GLFW_KEY_BACKSLASH, category));
-        zoomKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Zoom", GLFW.GLFW_KEY_LEFT_ALT, category));
+        autoAttackKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Auto Attack", GLFW.GLFW_KEY_R, "category.autumn"));
+        ignorePlayerKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Ignore Player", GLFW.GLFW_KEY_UNKNOWN, "category.autumn"));
+        freeCamKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Free Cam", GLFW.GLFW_KEY_H,
+                "category.autumn"));
+        settingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Open Autumn Settings", GLFW.GLFW_KEY_BACKSLASH, "category.autumn"));
+        zoomKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Zoom", GLFW.GLFW_KEY_LEFT_ALT, "category.autumn"));
 
+        BlockRenderLayerMap.INSTANCE.putBlock(Blocks.BARRIER, RenderLayer.getTranslucent());
         FabricLoader.getInstance().getModContainer(MOD_ID).ifPresent(container -> ResourceManagerHelper.registerBuiltinResourcePack(Identifier.of("autumn", "autumn"), container, Text.literal("Autumn"), ResourcePackActivationType.DEFAULT_ENABLED));
-        BlockRenderLayerMap.putBlock(Blocks.BARRIER, BlockRenderLayer.TRANSLUCENT);
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             options.autoAttack.setValue(false);
@@ -62,7 +60,8 @@ public class AutumnClient implements ClientModInitializer {
         });
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
-            if (client.player == null || client.interactionManager == null || client.world == null) return;
+            if (client.player == null || client.interactionManager == null || client.world == null)
+                return;
             while (settingKey.wasPressed()) {
                 client.setScreen(new SettingsScreen(client.currentScreen));
             }
@@ -81,7 +80,7 @@ public class AutumnClient implements ClientModInitializer {
             // FreeCam
             if (options.freeCam.getValue() && client.player.input instanceof KeyboardInput) {
                 Input input = new Input();
-                input.playerInput = new PlayerInput(false, false, false, false, false, client.player.input.playerInput.sneak(), false);
+                input.sneaking = client.player.input.sneaking;
                 client.player.input = input;
             } else if (!options.freeCam.getValue() && !(client.player.input instanceof KeyboardInput)) {
                 client.player.input = new KeyboardInput(client.options);
@@ -101,7 +100,8 @@ public class AutumnClient implements ClientModInitializer {
     }
 
     static void handleToggleKey(KeyBinding key, SimpleOption<Boolean> option, String name) {
-        if (client.player == null) return;
+        if (client.player == null)
+            return;
         while (key.wasPressed()) {
             option.setValue(!option.getValue());
             client.player.sendMessage(Text.of(name + " is now " + (option.getValue() ? "§aON" : "§cOFF")), true);

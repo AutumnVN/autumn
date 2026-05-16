@@ -1,5 +1,7 @@
 package autumnvn.autumn;
 
+import java.util.List;
+import java.util.Map;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.MinecraftClient;
@@ -9,9 +11,6 @@ import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.option.SimpleOption;
-
-import java.util.List;
-import java.util.Map;
 
 public class ButtonListWidget extends ElementListWidget<ButtonListWidget.ButtonEntry> {
     public ButtonListWidget(MinecraftClient client, int width, int height, int y, int itemHeight) {
@@ -47,10 +46,10 @@ public class ButtonListWidget extends ElementListWidget<ButtonListWidget.ButtonE
         }
 
         @Override
-        public void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float deltaTicks) {
+        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             this.buttons.forEach(button -> {
-                button.setY(getContentY());
-                button.render(context, mouseX, mouseY, deltaTicks);
+                button.setY(y);
+                button.render(context, mouseX, mouseY, tickDelta);
             });
         }
 
