@@ -21,6 +21,11 @@ public class ChatHudMixin {
         return AutumnClient.options.betterChat.getValue() ? 65536 : original;
     }
 
+    @ModifyConstant(method = "addVisibleMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V", constant = @Constant(intValue = 100))
+    private int visibleMessageLimit(int original) {
+        return AutumnClient.options.betterChat.getValue() ? 65536 : original;
+    }
+
     @Inject(method = "clear", at = @At("HEAD"), cancellable = true)
     public void clear(CallbackInfo ci) {
         if (AutumnClient.options.betterChat.getValue()) {
