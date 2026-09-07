@@ -1,107 +1,84 @@
 package autumnvn.autumn;
 
-import com.mojang.authlib.GameProfile;
-import net.minecraft.block.piston.PistonBehavior;
-import net.minecraft.client.input.KeyboardInput;
-import net.minecraft.client.network.ClientConnectionState;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.world.ClientChunkLoadProgress;
-import net.minecraft.entity.Entity;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.server.ServerLinks;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-
-import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
+import com.mojang.authlib.GameProfile;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.ClientInput;
+import net.minecraft.client.player.KeyboardInput;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 
-public class FreeCam extends ClientPlayerEntity {
+public class FreeCam extends AbstractClientPlayer {
 
-    static final ClientPlayNetworkHandler networkHandler = new ClientPlayNetworkHandler(
-            AutumnClient.client,
-            Objects.requireNonNull(AutumnClient.client.getNetworkHandler()).getConnection(),
-            new ClientConnectionState(
-                    new ClientChunkLoadProgress(),
-                    new GameProfile(UUID.randomUUID(), "FreeCam"),
-                    AutumnClient.client.getTelemetryManager().createWorldSession(false, null, null),
-                    AutumnClient.client.getNetworkHandler().getRegistryManager(),
-                    AutumnClient.client.getNetworkHandler().getEnabledFeatures(),
-                    AutumnClient.client.getNetworkHandler().getBrand(),
-                    AutumnClient.client.getCurrentServerEntry(),
-                    AutumnClient.client.currentScreen,
-                    Collections.emptyMap(),
-                    AutumnClient.client.inGameHud.getChatHud().toChatState(),
-                    Collections.emptyMap(),
-                    ServerLinks.EMPTY,
-                    Collections.emptyMap(),
-                    false
-            )
-    ) {
+    static final float sin45 = Mth.sin((float) Math.toRadians(45));
 
-        @Override
-        public void sendPacket(Packet<?> packet) {
-        }
-    };
+    public ClientInput input;
 
     public FreeCam() {
         super(
-                AutumnClient.client,
-                Objects.requireNonNull(AutumnClient.client.world),
-                networkHandler,
-                Objects.requireNonNull(AutumnClient.client.player).getStatHandler(),
-                AutumnClient.client.player.getRecipeBook(),
-                PlayerInput.DEFAULT,
-                false
-        );
+                Objects.requireNonNull(AutumnClient.minecraft.level),
+                new GameProfile(UUID.randomUUID(), "FreeCam"));
         setId(-1);
-        setLoaded(true);
         getAbilities().flying = true;
-        input = new KeyboardInput(AutumnClient.client.options);
-        refreshPositionAndAngles(
-                AutumnClient.client.player.getX(),
-                AutumnClient.client.player.getY(),
-                AutumnClient.client.player.getZ(),
-                AutumnClient.client.player.getYaw(),
-                AutumnClient.client.player.getPitch()
-        );
+        input = new KeyboardInput(AutumnClient.minecraft.options);
+        setPos(
+                Objects.requireNonNull(AutumnClient.minecraft.player).getX(),
+                AutumnClient.minecraft.player.getY(),
+                AutumnClient.minecraft.player.getZ());
+        setYRot(AutumnClient.minecraft.player.getYRot());
+        setXRot(AutumnClient.minecraft.player.getXRot());
     }
 
     public void spawn() {
-        Objects.requireNonNull(AutumnClient.client.world).addEntity(this);
+        Objects.requireNonNull(AutumnClient.minecraft.level).addEntity(this);
     }
 
     public void despawn() {
-        Objects.requireNonNull(AutumnClient.client.world).removeEntity(getId(), RemovalReason.DISCARDED);
+        Objects.requireNonNull(AutumnClient.minecraft.level).removeEntity(getId(), Entity.RemovalReason.DISCARDED);
     }
 
     @Override
-    public boolean isClimbing() {
+    public boolean onClimbable() {
         return false;
     }
 
     @Override
-    public boolean isTouchingWater() {
+    public boolean isInWater() {
         return false;
     }
 
     @Override
-    public boolean collidesWith(Entity other) {
+    public boolean canBeCollidedWith(Entity other) {
         return false;
     }
 
     @Override
-    public PistonBehavior getPistonBehavior() {
-        return PistonBehavior.IGNORE;
+    public boolean canCollideWith(Entity other) {
+        return false;
     }
 
-    static final float sin45 = MathHelper.sin((float) Math.toRadians(45));
+    @Override
+    public PushReaction getPistonPushReaction() {
+        return PushReaction.IGNORE;
+    }
 
     @Override
-    public void tickMovement() {
-        getAbilities().setFlySpeed(0);
+    public boolean isEffectiveAi() {
+        return true;
+    }
+
+    @Override
+    public boolean canSimulateMovement() {
+        return true;
+    }
+
+    @Override
+    public void tick() {
+        getAbilities().setFlyingSpeed(0);
 
         double horizontalSpeed = isSprinting() ? 1.5 : 1;
         double verticalSpeed = 1;
@@ -109,34 +86,52 @@ public class FreeCam extends ClientPlayerEntity {
         double y = 0.0;
         double z = 0.0;
 
-        Vec3d forward = Vec3d.fromPolar(0, getYaw());
-        Vec3d side = Vec3d.fromPolar(0, getYaw() + 90);
+        Vec3 forward = Vec3.directionFromRotation(0, getYRot());
+        Vec3 side = Vec3.directionFromRotation(0, getYRot() + 90);
 
         input.tick();
 
-        if (input.playerInput.forward() || input.playerInput.backward()) {
-            double direction = input.playerInput.forward() ? 1 : -1;
+        if (input.keyPresses.forward() || input.keyPresses.backward()) {
+            double direction = input.keyPresses.forward() ? 1 : -1;
             x += forward.x * horizontalSpeed * direction;
             z += forward.z * horizontalSpeed * direction;
         }
 
-        if (input.playerInput.right() || input.playerInput.left()) {
-            double direction = input.playerInput.right() ? 1 : -1;
+        if (input.keyPresses.right() || input.keyPresses.left()) {
+            double direction = input.keyPresses.right() ? 1 : -1;
             z += side.z * horizontalSpeed * direction;
             x += side.x * horizontalSpeed * direction;
         }
 
-        if ((input.playerInput.forward() || input.playerInput.backward()) && (input.playerInput.right() || input.playerInput.left())) {
+        if ((input.keyPresses.forward() || input.keyPresses.backward()) && (input.keyPresses.right() || input.keyPresses.left())) {
             x *= sin45;
             z *= sin45;
         }
 
-        if (input.playerInput.jump()) y += verticalSpeed;
-        if (input.playerInput.sneak()) y -= verticalSpeed;
-        setVelocity(x, y, z);
+        if (input.keyPresses.jump())
+            y += verticalSpeed;
+        if (input.keyPresses.shift())
+            y -= verticalSpeed;
+        setDeltaMovement(x, y, z);
 
-        super.tickMovement();
+        super.tick();
         getAbilities().flying = true;
         setOnGround(false);
+    }
+
+    @Override
+    protected void applyInput() {
+        Vec2 moveVector = input.getMoveVector();
+        if (moveVector.lengthSquared() != 0.0F) {
+            moveVector = moveVector.scale(0.98F);
+        }
+        applyInputHelper(moveVector, input.keyPresses.jump());
+    }
+
+    private void applyInputHelper(Vec2 moveVector, boolean jumping) {
+        this.xxa = moveVector.x;
+        this.zza = moveVector.y;
+        this.jumping = jumping;
+        this.setSprinting((AutumnClient.minecraft.options.keySprint.isDown() && input.keyPresses.forward()) || (input.keyPresses.forward() && this.isSprinting()));
     }
 }

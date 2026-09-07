@@ -1,12 +1,8 @@
 {
     "pack": {
-        "pack_format": 34,
-        "min_format": 34,
-        "max_format": 69,
-        "supported_formats": {
-            "min_inclusive": 34,
-            "max_inclusive": 69
-        },
+        "pack_format": 88,
+        "min_format": 88,
+        "max_format": 96,
         "description": "NoGreenNausea, NoTotemPop, RedTrappedChest, VisibleBarrier, PowderSnowBorder"
     }
 }

@@ -1,16 +1,16 @@
 package autumnvn.autumn;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.option.SimpleOption;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
+import net.minecraft.client.OptionInstance;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 
 public class SettingsScreen extends Screen {
     Screen parent;
     ButtonListWidget list;
-    SimpleOption<?>[] options = new SimpleOption<?>[]{
+    OptionInstance<?>[] options = new OptionInstance<?>[]{
             AutumnClient.options.autoAttack,
             AutumnClient.options.ignorePlayer,
             AutumnClient.options.autoHitSwap,
@@ -21,7 +21,6 @@ public class SettingsScreen extends Screen {
             AutumnClient.options.deathCoord,
             AutumnClient.options.freeCam,
             AutumnClient.options.fullBright,
-            AutumnClient.options.horseSwim,
             AutumnClient.options.infoHud,
             AutumnClient.options.instantSneak,
             AutumnClient.options.keepMiningWhenSwap,
@@ -40,13 +39,13 @@ public class SettingsScreen extends Screen {
     };
 
     public SettingsScreen(Screen parent) {
-        super(Text.of("Autumn Settings"));
+        super(Component.literal("Autumn Settings"));
         this.parent = parent;
     }
 
     @Override
     protected void init() {
-        this.list = new ButtonListWidget(this.client, this.width, this.height - 64, 32, 25);
+        this.list = new ButtonListWidget(this.minecraft, this.width, this.height - 64, 32, 25);
         for (int i = 0; i < options.length; i += 2) {
             if (i + 1 < options.length) {
                 this.list.addOptionEntry(options[i], options[i + 1]);
@@ -54,21 +53,21 @@ public class SettingsScreen extends Screen {
                 this.list.addOptionEntry(options[i]);
             }
         }
-        this.addDrawableChild(this.list);
+        this.addRenderableWidget(this.list);
 
-        ButtonWidget doneButton = ButtonWidget.builder(ScreenTexts.DONE, button -> {
+        Button doneButton = Button.builder(CommonComponents.GUI_DONE, button -> {
             AutumnClient.options.save();
-            if (this.client != null) {
-                this.client.setScreen(parent);
+            if (this.minecraft != null) {
+                this.minecraft.gui.setScreen(parent);
             }
-        }).dimensions(this.width / 2 - 100, this.height - 26, 200, 20).build();
-        this.addDrawableChild(doneButton);
+        }).bounds(this.width / 2 - 100, this.height - 26, 200, 20).build();
+        this.addRenderableWidget(doneButton);
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 12, 0xffffffff);
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(context, mouseX, mouseY, delta);
+        context.centeredText(this.font, this.title, this.width / 2, 12, 0xffffffff);
     }
 
     @Override
@@ -77,9 +76,9 @@ public class SettingsScreen extends Screen {
     }
 
     @Override
-    public void close() {
-        if (this.client != null) {
-            this.client.setScreen(parent);
+    public void onClose() {
+        if (this.minecraft != null) {
+            this.minecraft.gui.setScreen(parent);
         }
     }
 }

@@ -1,8 +1,8 @@
 package autumnvn.autumn.mixin.client;
 
 import autumnvn.autumn.AutumnClient;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -10,18 +10,18 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ClientPlayerEntity.class)
+@Mixin(LocalPlayer.class)
 public class ClientPlayerEntityMixin {
 
-    @Final
     @Shadow
-    protected MinecraftClient client;
+    @Final
+    protected Minecraft minecraft;
 
     // AutoSprint
-    @Inject(method = "tickMovement", at = @At("TAIL"))
-    private void tickMovement(CallbackInfo info) {
-        if (AutumnClient.options.autoSprint.getValue() && client.player != null) {
-            client.player.setSprinting(client.options.forwardKey.isPressed());
+    @Inject(method = "aiStep", at = @At("TAIL"))
+    private void aiStep(CallbackInfo info) {
+        if (AutumnClient.options.autoSprint.get() && minecraft.player != null) {
+            minecraft.player.setSprinting(minecraft.options.keyUp.isDown());
         }
     }
 }

@@ -2,36 +2,41 @@ package autumnvn.autumn.mixin.client;
 
 import autumnvn.autumn.AutumnClient;
 import autumnvn.autumn.FreeCam;
-import net.minecraft.block.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.shapes.EntityCollisionContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(AbstractBlock.AbstractBlockState.class)
+@Mixin(BlockBehaviour.BlockStateBase.class)
 public abstract class AbstractBlockStateMixin {
 
     @Shadow
-    public abstract boolean isOf(Block block);
+    public abstract Block getBlock();
 
     // FreeCam
-    @Inject(method = "getCollisionShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;", at = @At("HEAD"), cancellable = true)
-    private void getCollisionShape(BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir) {
-        if (context instanceof EntityShapeContext entityContext && entityContext.getEntity() instanceof FreeCam && AutumnClient.options.freeCam.getValue()) {
-            cir.setReturnValue(VoxelShapes.empty());
+    @Inject(method = "getCollisionShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;", at = @At("HEAD"), cancellable = true)
+    private void getCollisionShape(BlockGetter world, BlockPos pos, CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
+        if (context instanceof EntityCollisionContext entityContext && entityContext.getEntity() instanceof FreeCam && AutumnClient.options.freeCam.get()) {
+            cir.setReturnValue(Shapes.empty());
         }
     }
 
     // VisibleBarrier
-    @Inject(method = "isSideInvisible", at = @At("HEAD"), cancellable = true)
-    private void isSideInvisible(BlockState state, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        if (AutumnClient.options.visibleBarrier.getValue() && this.isOf(Blocks.BARRIER) && state.isOf(Blocks.BARRIER)) {
+    @Inject(method = "skipRendering", at = @At("HEAD"), cancellable = true)
+    private void skipRendering(BlockState state, Direction direction, CallbackInfoReturnable<Boolean> cir) {
+        if (AutumnClient.options.visibleBarrier.get() && this.getBlock() == Blocks.BARRIER && state.getBlock() == Blocks.BARRIER) {
             cir.setReturnValue(true);
         }
     }

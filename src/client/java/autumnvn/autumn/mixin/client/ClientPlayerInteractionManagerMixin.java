@@ -1,85 +1,108 @@
 package autumnvn.autumn.mixin.client;
 
 import autumnvn.autumn.AutumnClient;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.*;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.EntityTypeTags;
-import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.HoeItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.MaceItem;
+import net.minecraft.world.item.ShovelItem;
+import net.minecraft.world.item.TridentItem;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(ClientPlayerInteractionManager.class)
+@Mixin(MultiPlayerGameMode.class)
 public class ClientPlayerInteractionManagerMixin {
 
+    @Shadow
+    private int destroyDelay;
+
+    @Shadow
+    private BlockPos destroyBlockPos;
+
+    @Shadow
     @Final
-    @Shadow
-    private MinecraftClient client;
+    private Minecraft minecraft;
 
-    // NoMineDelay
-    @ModifyConstant(method = "updateBlockBreakingProgress", constant = @Constant(intValue = 5))
-    private int blockBreakingCooldown(int original) {
-        return AutumnClient.options.noMineDelay.getValue() ? 0 : original;
-    }
-
-    @Shadow
-    private ItemStack selectedStack;
+    @Unique
+    private int slot;
 
     // KeepMiningWhenSwap
-    @ModifyVariable(method = "isCurrentlyBreaking", at = @At("STORE"))
-    private ItemStack itemStack(ItemStack original) {
-        return AutumnClient.options.keepMiningWhenSwap.getValue() ? this.selectedStack : original;
+    @Inject(method = "sameDestroyTarget", at = @At("HEAD"), cancellable = true)
+    private void sameDestroyTarget(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        if (AutumnClient.options.keepMiningWhenSwap.get() && pos.equals(destroyBlockPos)) {
+            cir.setReturnValue(true);
+        }
+    }
+
+    // NoMineDelay
+    @Inject(method = "continueDestroyBlock", at = @At("HEAD"))
+    private void continueDestroyBlock(BlockPos blockPos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
+        if (AutumnClient.options.noMineDelay.get()) {
+            this.destroyDelay = 0;
+        }
     }
 
     // FreeCam
-    @Inject(method = "attackEntity", at = @At("HEAD"), cancellable = true)
-    private void attackEntity(PlayerEntity player, Entity target, CallbackInfo ci) {
-        if (target.equals(client.player)) {
+    @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
+    private void attack(Player player, Entity target, CallbackInfo ci) {
+        if (target == minecraft.player) {
             ci.cancel();
         }
     }
 
-    @Unique
-    int slot;
-
     // AutoHitSwap
-    @Inject(method = "attackEntity", at = @At("HEAD"))
-    private void attackEntity2(PlayerEntity player, Entity target, CallbackInfo ci) {
-        if (AutumnClient.options.autoHitSwap.getValue()) {
+    @Inject(method = "attack", at = @At("HEAD"))
+    private void attack2(Player player, Entity target, CallbackInfo ci) {
+        if (AutumnClient.options.autoHitSwap.get()) {
             slot = player.getInventory().getSelectedSlot();
-            ItemStack stack = player.getMainHandStack();
+            ItemStack stack = player.getMainHandItem();
             Item item = stack.getItem();
 
-            if (getAxeHotbarSlot(player) != -1 && target instanceof PlayerEntity playerEntity && playerEntity.getActiveItem().isOf(Items.SHIELD)) {
+            if (getAxeHotbarSlot(player) != -1 && target instanceof Player playerEntity && playerEntity.getUseItem().is(Items.SHIELD)) {
                 player.getInventory().setSelectedSlot(getAxeHotbarSlot(player));
                 return;
             }
 
-            if (getBreachMaceHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getArmor() > 15) {
+            if (getBreachMaceHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getArmorValue() > 15) {
                 player.getInventory().setSelectedSlot(getBreachMaceHotbarSlot(player));
                 return;
             }
 
-            if (getSmiteSwordHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getType().isIn(EntityTypeTags.UNDEAD)) {
+            if (getSmiteSwordHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && isInTag(livingEntity.getType(), EntityTypeTags.UNDEAD)) {
                 player.getInventory().setSelectedSlot(getSmiteSwordHotbarSlot(player));
                 return;
             }
 
-            if (getBaneOfArthropodsSwordHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getType().isIn(EntityTypeTags.ARTHROPOD)) {
+            if (getBaneOfArthropodsSwordHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && isInTag(livingEntity.getType(), EntityTypeTags.ARTHROPOD)) {
                 player.getInventory().setSelectedSlot(getBaneOfArthropodsSwordHotbarSlot(player));
                 return;
             }
 
-            if (getImpalingTridentHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && livingEntity.getType().isIn(EntityTypeTags.AQUATIC)) {
+            if (getImpalingTridentHotbarSlot(player) != -1 && target instanceof LivingEntity livingEntity && isInTag(livingEntity.getType(), EntityTypeTags.AQUATIC)) {
                 player.getInventory().setSelectedSlot(getImpalingTridentHotbarSlot(player));
                 return;
             }
@@ -89,25 +112,91 @@ public class ClientPlayerInteractionManagerMixin {
                 return;
             }
 
-            if (getNonWeaponHotbarSlot(player) != -1 && ((stack.isIn(ItemTags.SWORDS) && stack.getEnchantments().getEnchantments().isEmpty()) || (item instanceof AxeItem && !stack.getEnchantments().getEnchantments().contains(RegistryEntry.of(Enchantments.SHARPNESS))) || stack.isIn(ItemTags.PICKAXES) || item instanceof ShovelItem || item instanceof HoeItem || item instanceof TridentItem || item instanceof MaceItem)) {
+            if (getNonWeaponHotbarSlot(player) != -1 && ((stack.is(ItemTags.SWORDS) && stack.getEnchantments().isEmpty()) || (item instanceof AxeItem && !hasEnchantment(stack, Enchantments.SHARPNESS)) || stack.is(ItemTags.PICKAXES) || item instanceof ShovelItem || item instanceof HoeItem || item instanceof TridentItem || item instanceof MaceItem)) {
                 player.getInventory().setSelectedSlot(getNonWeaponHotbarSlot(player));
             }
         }
     }
 
-    @Inject(method = "attackEntity", at = @At("TAIL"))
-    private void attackEntity3(PlayerEntity player, Entity target, CallbackInfo ci) {
-        if (AutumnClient.options.autoHitSwap.getValue()) {
+    @Inject(method = "attack", at = @At("TAIL"))
+    private void attack3(Player player, Entity target, CallbackInfo ci) {
+        if (AutumnClient.options.autoHitSwap.get()) {
             player.getInventory().setSelectedSlot(slot);
         }
     }
 
     @Unique
-    int getAxeHotbarSlot(PlayerEntity player) {
+    private static int getAxeHotbarSlot(Player player) {
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = player.getInventory().getStack(i);
+            ItemStack stack = player.getInventory().getItem(i);
+            if (stack.getItem() instanceof AxeItem) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Unique
+    private static int getBreachMaceHotbarSlot(Player player) {
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = player.getInventory().getItem(i);
+            if (stack.getItem() == Items.MACE && hasEnchantment(stack, Enchantments.BREACH)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Unique
+    private static int getSmiteSwordHotbarSlot(Player player) {
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = player.getInventory().getItem(i);
+            if (stack.is(ItemTags.SWORDS) && hasEnchantment(stack, Enchantments.SMITE)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Unique
+    private static int getBaneOfArthropodsSwordHotbarSlot(Player player) {
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = player.getInventory().getItem(i);
+            if (stack.is(ItemTags.SWORDS) && hasEnchantment(stack, Enchantments.BANE_OF_ARTHROPODS)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Unique
+    private static int getImpalingTridentHotbarSlot(Player player) {
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = player.getInventory().getItem(i);
+            if (stack.getItem() instanceof TridentItem && hasEnchantment(stack, Enchantments.IMPALING)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Unique
+    private static int getEnchantedSwordHotbarSlot(Player player) {
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = player.getInventory().getItem(i);
+            if (stack.is(ItemTags.SWORDS) && !stack.getEnchantments().isEmpty()) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Unique
+    private static int getNonWeaponHotbarSlot(Player player) {
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = player.getInventory().getItem(i);
             Item item = stack.getItem();
-            if (item instanceof AxeItem) {
+            if (!stack.is(ItemTags.SWORDS) && !(item instanceof AxeItem) && !stack.is(ItemTags.PICKAXES) && !(item instanceof ShovelItem) && !(item instanceof HoeItem) && !(item instanceof TridentItem) && !(item instanceof MaceItem)) {
                 return i;
             }
         }
@@ -115,71 +204,22 @@ public class ClientPlayerInteractionManagerMixin {
     }
 
     @Unique
-    int getBreachMaceHotbarSlot(PlayerEntity player) {
-        for (int i = 0; i < 9; i++) {
-            ItemStack stack = player.getInventory().getStack(i);
-            Item item = stack.getItem();
-            if (item == Items.MACE && stack.getEnchantments().getEnchantments().contains(RegistryEntry.of(Enchantments.BREACH))) {
-                return i;
+    private static boolean hasEnchantment(ItemStack stack, ResourceKey<Enchantment> enchantment) {
+        for (Holder<Enchantment> holder : stack.getEnchantments().keySet()) {
+            if (holder.is(enchantment)) {
+                return true;
             }
         }
-        return -1;
+        return false;
     }
 
     @Unique
-    int getSmiteSwordHotbarSlot(PlayerEntity player) {
-        for (int i = 0; i < 9; i++) {
-            ItemStack stack = player.getInventory().getStack(i);
-            if (stack.isIn(ItemTags.SWORDS) && stack.getEnchantments().getEnchantments().contains(RegistryEntry.of(Enchantments.SMITE))) {
-                return i;
+    private static boolean isInTag(EntityType<?> type, TagKey<EntityType<?>> tag) {
+        for (Holder<EntityType<?>> holder : BuiltInRegistries.ENTITY_TYPE.getTagOrEmpty(tag)) {
+            if (holder.value() == type) {
+                return true;
             }
         }
-        return -1;
-    }
-
-    @Unique
-    int getBaneOfArthropodsSwordHotbarSlot(PlayerEntity player) {
-        for (int i = 0; i < 9; i++) {
-            ItemStack stack = player.getInventory().getStack(i);
-            if (stack.isIn(ItemTags.SWORDS) && stack.getEnchantments().getEnchantments().contains(RegistryEntry.of(Enchantments.BANE_OF_ARTHROPODS))) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    @Unique
-    int getImpalingTridentHotbarSlot(PlayerEntity player) {
-        for (int i = 0; i < 9; i++) {
-            ItemStack stack = player.getInventory().getStack(i);
-            Item item = stack.getItem();
-            if (item instanceof TridentItem && stack.getEnchantments().getEnchantments().contains(RegistryEntry.of(Enchantments.IMPALING))) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    @Unique
-    int getEnchantedSwordHotbarSlot(PlayerEntity player) {
-        for (int i = 0; i < 9; i++) {
-            ItemStack stack = player.getInventory().getStack(i);
-            if (stack.isIn(ItemTags.SWORDS) && !stack.getEnchantments().getEnchantments().isEmpty()) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    @Unique
-    int getNonWeaponHotbarSlot(PlayerEntity player) {
-        for (int i = 0; i < 9; i++) {
-            ItemStack stack = player.getInventory().getStack(i);
-            Item item = stack.getItem();
-            if (!(stack.isIn(ItemTags.SWORDS)) && !(item instanceof AxeItem) && !(stack.isIn(ItemTags.PICKAXES)) && !(item instanceof ShovelItem) && !(item instanceof HoeItem) && !(item instanceof TridentItem) && !(item instanceof MaceItem)) {
-                return i;
-            }
-        }
-        return -1;
+        return false;
     }
 }

@@ -1,8 +1,8 @@
 package autumnvn.autumn.mixin.client;
 
 import autumnvn.autumn.AutumnClient;
-import net.minecraft.client.gui.screen.DeathScreen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.DeathScreen;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -14,17 +14,16 @@ public class DeathScreenMixin {
     // DeathCoord
     @Inject(method = "init", at = @At("HEAD"))
     private void init(CallbackInfo ci) {
-        if (AutumnClient.options.deathCoord.getValue()) {
-            if (AutumnClient.client.player != null && AutumnClient.client.world != null) {
-                AutumnClient.client.player.sendMessage(Text.of(
+        if (AutumnClient.options.deathCoord.get()) {
+            if (AutumnClient.minecraft.player != null && AutumnClient.minecraft.level != null) {
+                AutumnClient.minecraft.player.sendSystemMessage(Component.literal(
                         String.format("You died at §a%d %d %d §rin §a%s",
-                                AutumnClient.client.player.getBlockX(),
-                                AutumnClient.client.player.getBlockY(),
-                                AutumnClient.client.player.getBlockZ(),
-                                AutumnClient.client.world.getRegistryKey().getValue().toString().split(":")[1])
-                ), false);
+                                AutumnClient.minecraft.player.getBlockX(),
+                                AutumnClient.minecraft.player.getBlockY(),
+                                AutumnClient.minecraft.player.getBlockZ(),
+                                AutumnClient.minecraft.level.dimension().identifier().getPath())
+                ));
             }
         }
     }
-
 }

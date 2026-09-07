@@ -1,10 +1,10 @@
 package autumnvn.autumn.mixin.client;
 
 import autumnvn.autumn.SettingsScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.option.OptionsScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.options.OptionsScreen;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,28 +15,29 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class OptionsScreenMixin extends Screen {
 
     @Unique
-    private ButtonWidget settingsButton;
+    private Button settingsButton;
 
     // SettingsButton
-    @Inject(method = "init", at = @At("TAIL"))
+    @Inject(method = "init()V", at = @At("TAIL"))
     private void init(CallbackInfo info) {
 
-        settingsButton = ButtonWidget.builder(Text.of("Autumn Settings..."), button -> {
-            if (this.client != null) {
-                this.client.setScreen(new SettingsScreen(this));
+        settingsButton = Button.builder(Component.literal("Autumn Settings..."), button -> {
+            if (this.minecraft != null) {
+                minecraft.gui.setScreen(new SettingsScreen(this));
             }
-        }).dimensions(this.width / 2 - 154, 54, 150, 20).build();
-        this.addDrawableChild(settingsButton);
+        }).bounds(this.width / 2 - 154, 54, 150, 20).build();
+        this.addRenderableWidget(settingsButton);
     }
 
-    @Inject(method = "refreshWidgetPositions", at = @At("TAIL"))
-    private void refreshWidgetPositions(CallbackInfo info) {
+    @Inject(method = "repositionElements()V", at = @At("TAIL"))
+    private void repositionElements(CallbackInfo info) {
         if (settingsButton != null) {
-            settingsButton.setPosition(this.width / 2 - 154, 54);
+            settingsButton.setX(this.width / 2 - 154);
+            settingsButton.setY(54);
         }
     }
 
     public OptionsScreenMixin() {
-        super(Text.translatable("options.title", new Object[0]));
+        super(Component.translatable("options.title"));
     }
 }

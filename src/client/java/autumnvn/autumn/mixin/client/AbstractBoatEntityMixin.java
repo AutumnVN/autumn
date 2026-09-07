@@ -1,21 +1,21 @@
 package autumnvn.autumn.mixin.client;
 
-import autumnvn.autumn.AutumnClient;
-import net.minecraft.entity.vehicle.AbstractBoatEntity;
-import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import autumnvn.autumn.AutumnClient;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 
-@Mixin(AbstractBoatEntity.class)
+@Mixin(AbstractBoat.class)
 public class AbstractBoatEntityMixin {
 
     // Boat360
-    @Redirect(method = "clampPassengerYaw", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;clamp(FFF)F"))
+    @Redirect(method = "clampRotation(Lnet/minecraft/world/entity/Entity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(FFF)F"))
     private float clamp(float value, float min, float max) {
-        if (AutumnClient.options.boat360.getValue()) {
+        if (AutumnClient.options.boat360.get()) {
             return value;
         }
-        return MathHelper.clamp(value, min, max);
+        return Mth.clamp(value, min, max);
     }
 }

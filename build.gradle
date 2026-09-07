@@ -1,14 +1,9 @@
 plugins {
-    id 'fabric-loom' version "${loom_version}"
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
     id 'maven-publish'
 }
 
 version = project.mod_version
-group = project.maven_group
-
-base {
-    archivesName = project.archives_base_name
-}
 
 repositories {
     maven { url "https://maven.terraformersmc.com/" }
@@ -28,47 +23,47 @@ loom {
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-    modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+    implementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 }
 
 processResources {
-    inputs.property "version", project.version
+	def version = project.version
+	inputs.property "version", version
 
-    filesMatching("fabric.mod.json") {
-        expand "version": inputs.properties.version
-    }
+	filesMatching("fabric.mod.json") {
+		expand "version": version
+	}
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+	it.options.release = 25
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
-    inputs.property "archivesName", project.base.archivesName
+	def projectName = project.name
+	inputs.property "projectName", projectName
 
-    from("LICENSE") {
-        rename { "${it}_${inputs.properties.archivesName}" }
-    }
+	from("LICENSE") {
+		rename { "${it}_$projectName"}
+	}
 }
 
 publishing {
-    publications {
-        create("mavenJava", MavenPublication) {
-            artifactId = project.archives_base_name
-            from components.java
-        }
-    }
+	publications {
+		create("mavenJava", MavenPublication) {
+			from components.java
+		}
+	}
 
-    repositories {
-    }
+	repositories {
+	}
 }

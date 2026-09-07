@@ -1,12 +1,13 @@
 package autumnvn.autumn;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityReference;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Objects;
 
@@ -25,15 +26,15 @@ public class Utils {
     static TimedEntity recentTargetedEntity;
 
     public static Entity getTargetedEntity() {
-        Entity cameraEntity = AutumnClient.client.getCameraEntity();
+        Entity cameraEntity = AutumnClient.minecraft.getCameraEntity();
         if (cameraEntity == null) return null;
 
         double maxDistance = 128;
-        float tickDelta = AutumnClient.client.getRenderTickCounter().getTickProgress(true);
-        Vec3d vec3d = cameraEntity.getEyePos();
-        Vec3d vec3d2 = cameraEntity.getRotationVec(tickDelta).multiply(maxDistance);
-        Box box = cameraEntity.getBoundingBox().stretch(vec3d2).expand(1.0);
-        EntityHitResult entityHitResult = ProjectileUtil.raycast(cameraEntity, vec3d, vec3d.add(vec3d2), box, EntityPredicates.CAN_HIT, maxDistance * maxDistance);
+        float tickDelta = AutumnClient.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(true);
+        Vec3 vec3d = cameraEntity.getEyePosition();
+        Vec3 vec3d2 = cameraEntity.getViewVector(tickDelta).scale(maxDistance);
+        AABB box = cameraEntity.getBoundingBox().expandTowards(vec3d2).inflate(1.0);
+        EntityHitResult entityHitResult = ProjectileUtil.getEntityHitResult(cameraEntity, vec3d, vec3d.add(vec3d2), box, entity -> !entity.isSpectator() && entity.isPickable(), maxDistance * maxDistance);
 
         if (entityHitResult != null) {
             recentTargetedEntity = new TimedEntity(entityHitResult.getEntity());
@@ -53,8 +54,10 @@ public class Utils {
     }
 
     public static String getOwnerName(Entity entity) {
-        if (!(entity instanceof TameableEntity tameableEntity)) return null;
+        if (!(entity instanceof TamableAnimal tameableEntity)) return null;
 
-        return tameableEntity.getOwner() == null ? null : Objects.requireNonNull(tameableEntity.getOwner().getDisplayName()).getString();
+        if (AutumnClient.minecraft.level == null) return null;
+        LivingEntity owner = EntityReference.get(tameableEntity.getOwnerReference(), AutumnClient.minecraft.level, LivingEntity.class);
+        return owner == null ? null : Objects.requireNonNull(owner.getDisplayName()).getString();
     }
 }
