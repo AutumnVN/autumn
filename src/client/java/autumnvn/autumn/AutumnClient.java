@@ -68,7 +68,7 @@ public class AutumnClient implements ClientModInitializer {
 
             // AutoAttack
             if (options.autoAttack.get() && minecraft.player.getAttackStrengthScale(0.0F) >= 1.0F) {
-                if (minecraft.crosshairPickEntity instanceof LivingEntity livingEntity && livingEntity.isAttackable() && livingEntity.isAlive() && livingEntity.hurtTime == 0 && !(options.ignorePlayer.get() && livingEntity instanceof Player)) {
+                if (minecraft.crosshairPickEntity instanceof LivingEntity livingEntity && livingEntity != minecraft.player && livingEntity.isAttackable() && livingEntity.isAlive() && livingEntity.hurtTime == 0 && !(options.ignorePlayer.get() && livingEntity instanceof Player)) {
                     minecraft.gameMode.attack(minecraft.player, livingEntity);
                     minecraft.player.swing(InteractionHand.MAIN_HAND);
                 }
